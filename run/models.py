@@ -1,6 +1,7 @@
 from django.db import models
 from storage.models import File
 from game_runner import settings
+import uuid
 
 
 # Initial scheme
@@ -31,6 +32,7 @@ class FilePath(models.Model):
 
 class Run(models.Model):
     # token = Token()
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     request_time = models.DateTimeField(auto_now_add=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
