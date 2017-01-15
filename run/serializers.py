@@ -14,7 +14,7 @@ class RunSerializer(serializers.ModelSerializer):
         model = Run
         fields = (
             # 'token', 'game',
-            'id', 'request_time', 'start_time', 'end_time', 'owner', 'input_file_paths', 'output_file_paths', 'log',)
+            'id', 'end_time', 'output_file_paths', 'log',)
         read_only_fields = (
             # 'token'
             'id', 'request_time', 'start_time', 'end_time', 'owner', 'log',)

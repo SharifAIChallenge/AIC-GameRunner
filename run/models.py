@@ -26,7 +26,7 @@ import uuid
 
 class FilePath(models.Model):
     file = File()
-    path = models.FilePathField()
+    # definition = models.ForeignKey('FileDefinition') later should be uncommented
     run = models.ForeignKey('Run')
 
 
@@ -37,7 +37,17 @@ class Run(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
-    input_file_paths = models.ManyToManyField(FilePath, 'destination_run')
-    output_file_paths = models.ManyToManyField(FilePath, 'source_run')
+    input_file_paths = models.ManyToManyField(to=FilePath, related_name='destination_run')
+    output_file_paths = models.ManyToManyField(to=FilePath, related_name='source_run')
     log = models.TextField()
+    # choices for the status
+    PENDING = 3
+    SUCCESS = 1
+    FAILURE = 2
+    status_choices = (
+        (SUCCESS, 'Success'),
+        (FAILURE, 'Failure'),
+        (PENDING, 'Pending'),
+    )
+    status = models.SmallIntegerField(choices=status_choices)
     # game = Game()
