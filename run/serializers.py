@@ -24,7 +24,7 @@ class RunReportSerializer(serializers.ModelSerializer):
         fields = (
             # 'token', 'game',
             'id', 'status', 'end_time', 'output_file_paths', 'log',)
-        read_only_fields = '__all__'
+        read_only_fields = fields
 
 
 class RunCreateSerializer(serializers.ModelSerializer):
@@ -36,4 +36,3 @@ class RunCreateSerializer(serializers.ModelSerializer):
         fields = (
             # 'game',
             'id', 'input_file_paths', 'output_file_paths',)
-        read_only_fields = '__all__'

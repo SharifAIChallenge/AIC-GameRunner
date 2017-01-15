@@ -1,6 +1,6 @@
 from rest_framework.parsers import JSONParser
-from .serializers import RunCreateSerializer, RunReportSerializer
-from .models import Run
+from run.serializers import RunCreateSerializer, RunReportSerializer
+from run.models import Run
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -26,9 +26,9 @@ class RunCreateView(APIView):
 
 
 class RunReportView(APIView):
-    def get(self, request):
+    def post(self, request):
         data = JSONParser().parse(request)
-        runs = Run.objects.all().query(end_time_gte=data['from_time'])
+        runs = Run.objects.all().filter(end_time__gte=data['from_time'])
         result = []
         for run in runs:
             serializer = RunReportSerializer(run)

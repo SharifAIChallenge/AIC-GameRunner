@@ -25,7 +25,7 @@ import uuid
 #   +report(from_time : DateTime) : runs : Run[]
 
 class FilePath(models.Model):
-    file = models.ForeignKey(File)
+    file = models.ForeignKey(File, default=None)
     # definition = models.ForeignKey('FileDefinition') later should be uncommented
     run = models.ForeignKey('Run')
 
@@ -33,9 +33,9 @@ class FilePath(models.Model):
 class Run(models.Model):
     # token = Token()
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    request_time = models.DateTimeField(auto_now_add=True)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    request_time = models.DateTimeField(auto_now_add=True, null=True)
+    start_time = models.DateTimeField(null=True)
+    end_time = models.DateTimeField(null=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
     input_file_paths = models.ManyToManyField(to=FilePath, related_name='destination_run')
     output_file_paths = models.ManyToManyField(to=FilePath, related_name='source_run')
@@ -49,5 +49,5 @@ class Run(models.Model):
         (FAILURE, 'Failure'),
         (PENDING, 'Pending'),
     )
-    status = models.SmallIntegerField(choices=status_choices)
+    status = models.SmallIntegerField(choices=status_choices, default=PENDING)
     # game = Game()
