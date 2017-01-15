@@ -1,20 +1,39 @@
 from rest_framework import serializers
 from .models import Run
 from .models import FilePath
+from storage.serializers import FileSerializer
 
 
 class FilePathSerializer(serializers.ModelSerializer):
+    file = FileSerializer(many=False)
+
+    # definition = FileDefinitionSerializer()
+
     class Meta:
         model = FilePath
-        fields = ('file', 'path',)
+        fields = ('file',
+                  # 'definition',
+                  )
 
 
-class RunSerializer(serializers.ModelSerializer):
+class RunReportSerializer(serializers.ModelSerializer):
+    output_file_paths = FilePathSerializer(many=True, read_only=True)
+
     class Meta:
         model = Run
         fields = (
             # 'token', 'game',
-            'id', 'end_time', 'output_file_paths', 'log',)
-        read_only_fields = (
-            # 'token'
-            'id', 'request_time', 'start_time', 'end_time', 'owner', 'log',)
+            'id', 'status', 'end_time', 'output_file_paths', 'log',)
+        read_only_fields = '__all__'
+
+
+class RunCreateSerializer(serializers.ModelSerializer):
+    output_file_paths = FilePathSerializer(many=True)
+    input_file_paths = FilePathSerializer(many=True)
+
+    class Meta:
+        model = Run
+        fields = (
+            # 'game',
+            'id', 'input_file_paths', 'output_file_paths',)
+        read_only_fields = '__all__'

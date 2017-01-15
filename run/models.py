@@ -25,7 +25,7 @@ import uuid
 #   +report(from_time : DateTime) : runs : Run[]
 
 class FilePath(models.Model):
-    file = File()
+    file = models.ForeignKey(File)
     # definition = models.ForeignKey('FileDefinition') later should be uncommented
     run = models.ForeignKey('Run')
 
