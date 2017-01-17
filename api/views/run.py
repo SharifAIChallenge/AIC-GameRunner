@@ -12,7 +12,7 @@ class RunCreateView(APIView):
     def post(self, request):
         runs_json = JSONParser().parse(request)
         # validate if the data is a list
-        if runs_json is not list:
+        if not isinstance(runs_json, list):
             return Response({'result': 'Provided data is not a list.'}, status=status.HTTP_400_BAD_REQUEST)
         result = []
         for run_json in runs_json:
