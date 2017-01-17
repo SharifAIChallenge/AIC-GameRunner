@@ -28,11 +28,15 @@ class RunReportSerializer(serializers.ModelSerializer):
 
 
 class RunCreateSerializer(serializers.ModelSerializer):
-    output_file_paths = FilePathSerializer(many=True)
-    input_file_paths = FilePathSerializer(many=True)
+    file_path_set = FilePathSerializer(many=True)
 
     class Meta:
         model = Run
         fields = (
             # 'game',
-            'id', 'file_path_set',)
+            'file_path_set',)
+
+    def create(self, validated_data):
+        run = Run(file_path_set=validated_data['file_path_set'])
+        run.save()
+        return run

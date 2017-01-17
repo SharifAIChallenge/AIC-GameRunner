@@ -28,6 +28,7 @@ class TestRunAPI(TestCase):
 
     def test_create_view(self):
         response = self.client.post('/api/run/run',
-                                    data='[{"id":"a8951015-cc13-47b7-bdc2-210c9e17bc5b","status":3,"end_time":"2017-01-15T19:51:06Z","log":"","file_path_set":[{"file":{"id":"b8ac8015-cd8b-4a3e-ba7d-824ebe4d4f58","created_at":"2017-01-17T05:17:30.970286Z","owner":null,"file":null}}]}]',
+                                    data='[{"file_path_set":[]}]',
                                     content_type='application/json')
-        print(response.content)
+        data = JSONParser().parse(BytesIO(response.content))
+        self.assertRegex(data['result'][0], '.*-.*-.*-.*-.*')
