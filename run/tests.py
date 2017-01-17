@@ -26,9 +26,16 @@ class TestRunAPI(TestCase):
         self.assertEqual(data['end_time'], '2017-01-15T19:51:06Z')
         self.assertEqual(data['status'], 3)
 
-    def test_create_view(self):
+    def test_create_view_bad_request(self):
         response = self.client.post('/api/run/run',
-                                    data='[{"file_path_set":[]}]',
+                                    data='[{"file_path_set":{}}]',
                                     content_type='application/json')
         data = JSONParser().parse(BytesIO(response.content))
-        self.assertRegex(data['result'][0], '.*-.*-.*-.*-.*')
+        self.assertFalse(data[0]['success'])
+
+    def test_create_view(self):
+        response = self.client.post('/api/run/run',
+                                    data='[{"files":{"client_1":{"id":"%s","is_input":"True"}}}]' % self.file_1.id,
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = JSONParser().parse(BytesIO(response.content))
