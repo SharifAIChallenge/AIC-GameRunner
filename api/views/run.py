@@ -13,16 +13,22 @@ class RunCreateView(APIView):
         runs_json = JSONParser().parse(request)
         # validate if the data is a list
         if not isinstance(runs_json, list):
-            return Response({'result': 'Provided data is not a list.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         result = []
         for run_json in runs_json:
             serializer = RunCreateSerializer(data=run_json)
             if serializer.is_valid():
                 run = serializer.save()
-                result.append(run.id)  # We will replace id by token
+                result.append({
+                    'success': True,
+                    'run_id': run.id
+                })
             else:
-                result.append(serializer.error_messages)
-        return Response({'result': result}, status=status.HTTP_207_MULTI_STATUS)
+                result.append({
+                    'success': False,
+                    'errors': serializer.error_messages
+                })
+        return Response(result, status=status.HTTP_200_OK)
 
 
 class RunReportView(APIView):

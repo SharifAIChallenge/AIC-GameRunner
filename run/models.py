@@ -27,10 +27,7 @@ import uuid
 class FilePath(models.Model):
     file = models.ForeignKey(File, default=None)
     # definition = models.ForeignKey('FileDefinition') later should be uncommented
-    # Note that we represent it as two booleans because one file can be input and output at the same time, the learning
-    # data for example
     is_input = models.BooleanField()
-    is_output = models.BooleanField()
     run = models.ForeignKey('Run', related_name='file_path_set')
 
 
