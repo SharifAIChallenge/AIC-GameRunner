@@ -27,18 +27,19 @@ import uuid
 class FilePath(models.Model):
     file = models.ForeignKey(File, default=None)
     # definition = models.ForeignKey('FileDefinition') later should be uncommented
-    run = models.ForeignKey('Run')
+    # Note that we represent it as two booleans because one file can be input and output at the same time, the learning
+    # data for example
+    is_input = models.BooleanField()
+    is_output = models.BooleanField()
+    run = models.ForeignKey('Run', related_name='file_path_set')
 
 
 class Run(models.Model):
-    # token = Token()
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     request_time = models.DateTimeField(auto_now_add=True, null=True)
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
-    input_file_paths = models.ManyToManyField(to=FilePath, related_name='destination_run')
-    output_file_paths = models.ManyToManyField(to=FilePath, related_name='source_run')
     log = models.TextField()
     # choices for the status
     PENDING = 3

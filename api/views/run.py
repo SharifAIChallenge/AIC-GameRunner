@@ -13,7 +13,7 @@ class RunCreateView(APIView):
         runs_json = JSONParser().parse(request)
         # validate if the data is a list
         if runs_json is not list:
-            return Response({'result': None}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'result': 'Provided data is not a list.'}, status=status.HTTP_400_BAD_REQUEST)
         result = []
         for run_json in runs_json:
             serializer = RunCreateSerializer(data=run_json)

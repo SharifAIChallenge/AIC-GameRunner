@@ -2,7 +2,8 @@ from django.test import TestCase
 from rest_framework.parsers import JSONParser
 from io import BytesIO
 
-from .models import Run
+from .models import Run, FilePath
+from storage.models import File
 
 
 # Create your tests here.
@@ -10,6 +11,10 @@ class TestRunAPI(TestCase):
     def setUp(self):
         self.run_1 = Run(start_time='2017-01-15 19:51:06', end_time='2017-01-15T19:51:06Z')
         self.run_1.save()
+        self.file_1 = File()
+        self.file_1.save()
+        self.file_path_1 = FilePath(file=self.file_1, run=self.run_1, is_input=True, is_output=True)
+        self.file_path_1.save()
 
     def test_report_view(self):
         response = self.client.post('/api/run/report', data='{"from_time": "2017-01-15 19:51:06"}',
@@ -17,8 +22,12 @@ class TestRunAPI(TestCase):
         data = JSONParser().parse(BytesIO(response.content))[0]
         self.assertTrue('id' in data)
         self.assertTrue('log' in data)
-        self.assertTrue('output_file_paths' in data)
+        self.assertTrue('file_path_set' in data)
         self.assertEqual(data['end_time'], '2017-01-15T19:51:06Z')
         self.assertEqual(data['status'], 3)
 
-
+    def test_create_view(self):
+        response = self.client.post('/api/run/run',
+                                    data='[{"id":"a8951015-cc13-47b7-bdc2-210c9e17bc5b","status":3,"end_time":"2017-01-15T19:51:06Z","log":"","file_path_set":[{"file":{"id":"b8ac8015-cd8b-4a3e-ba7d-824ebe4d4f58","created_at":"2017-01-17T05:17:30.970286Z","owner":null,"file":null}}]}]',
+                                    content_type='application/json')
+        print(response.content)

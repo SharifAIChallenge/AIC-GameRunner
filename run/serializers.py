@@ -17,13 +17,13 @@ class FilePathSerializer(serializers.ModelSerializer):
 
 
 class RunReportSerializer(serializers.ModelSerializer):
-    output_file_paths = FilePathSerializer(many=True, read_only=True)
+    file_path_set = FilePathSerializer(many=True, read_only=True)
 
     class Meta:
         model = Run
         fields = (
-            # 'token', 'game',
-            'id', 'status', 'end_time', 'output_file_paths', 'log',)
+            # 'game',
+            'id', 'status', 'end_time', 'log', 'file_path_set')
         read_only_fields = fields
 
 
@@ -35,4 +35,4 @@ class RunCreateSerializer(serializers.ModelSerializer):
         model = Run
         fields = (
             # 'game',
-            'id', 'input_file_paths', 'output_file_paths',)
+            'id', 'file_path_set',)
