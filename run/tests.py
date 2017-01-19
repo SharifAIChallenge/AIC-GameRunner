@@ -35,7 +35,7 @@ class TestRunAPI(TestCase):
 
     def test_create_view(self):
         response = self.client.post('/api/run/run',
-                                    data='[{"files":{"client_1":{"id":"%s","is_input":"True"}}}]' % self.file_1.id,
+                                    data='[{"files":{"client_1":{"id":"%s"}}}]' % self.file_1.id,
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = JSONParser().parse(BytesIO(response.content))

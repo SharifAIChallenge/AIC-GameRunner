@@ -40,10 +40,8 @@ class FilePathSetSerializerField(serializers.Field):
         for file_definition in data:
             if 'id' not in data[file_definition]:
                 raise serializers.ValidationError('file id not provided.')
-            if 'is_input' not in data[file_definition]:
-                raise serializers.ValidationError('file id not provided.')
             internal_value.append(FilePath(file=File.objects.get(id=data[file_definition]['id']),
-                                           is_input=data[file_definition]['is_input']))
+                                           is_input=True))
         return internal_value
         #
         # def to_representation(self, value):
