@@ -1,90 +1,69 @@
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import JSONParser
-
-from game.models import Operation, OperationParameter
 from run.models import Run
-from run.models import ParameterValue
+from run.models import FilePath
 from storage.models import File
 from storage.serializers import FileSerializer
 
 
-# class FilePathSerializer(serializers.ModelSerializer):
-#     file = FileSerializer(many=False)
-#
-#     # definition = FileDefinitionSerializer()
-#
-#     class Meta:
-#         model = FilePath
-#         fields = ('file',
-#                   # 'definition',
-#                   )
+class FilePathSerializer(serializers.ModelSerializer):
+    file = FileSerializer(many=False)
 
-class ParameterValueSetSerializerField(serializers.Field):
-    def to_representation(self, value):
-        result = {}
-        for parameter_value in value:
-            # todo serialize file definition
-            result[parameter_value.parameter.name] = parameter_value._value
-        return result
+    # definition = FileDefinitionSerializer()
 
-    def to_internal_value(self, data):
-        internal_value = []
-        if not isinstance(data, dict):
-            raise serializers.ValidationError('parameters data must be a dictionary.')
-        for parameter in data:
-            internal_value.append((OperationParameter.objects.get(name=parameter), data[parameter]))
-        return internal_value
-
-
-class OperationSerializerFiled(serializers.Field):
-    def to_internal_value(self, data):
-        return Operation.objects.get(name=data)
-
-    def to_representation(self, value):
-        return value.name
+    class Meta:
+        model = FilePath
+        fields = ('file',
+                  # 'definition',
+                  )
 
 
 class RunReportSerializer(serializers.ModelSerializer):
-    parameters = ParameterValueSetSerializerField(read_only=True)
-    operation = OperationSerializerFiled()
+    file_path_set = FilePathSerializer(many=True, read_only=True)
 
     class Meta:
         model = Run
         fields = (
-            'id', 'operation', 'status', 'end_time', 'log', 'parameters')
+            # 'game',
+            'id', 'status', 'end_time', 'log', 'file_path_set')
         read_only_fields = fields
 
-    def to_representation(self, instance):
-        data = super(RunReportSerializer, self).to_representation(instance)
-        data['parameters'] = ParameterValueSetSerializerField().to_representation(
-            instance.parameter_value_set.all().filter(parameter__is_input=False))
-        return data
+
+class FilePathSetSerializerField(serializers.Field):
+    def to_representation(self, value):
+        raise NotImplemented()
+
+    def to_internal_value(self, data):
+        internal_value = []
+        if not isinstance(data, dict):
+            raise serializers.ValidationError('files data must be a dictionary.')
+        for file_definition in data:
+            if 'id' not in data[file_definition]:
+                raise serializers.ValidationError('file id not provided.')
+            internal_value.append(FilePath(file=File.objects.get(id=data[file_definition]['id']),
+                                           is_input=True))
+        return internal_value
+        #
+        # def to_representation(self, value):
+        #     file_paths = []
+        #     if not isinstance(value, FilePath):
+        #         raise TypeError()
+        #     for file_path in self.instance:
+        #         file_paths.append(FilePathSerializer(file_path).data)
 
 
 class RunCreateSerializer(serializers.Serializer):
-    parameters = ParameterValueSetSerializerField()
-    operation = OperationSerializerFiled()
+    files = FilePathSetSerializerField()
 
     def update(self, instance, validated_data):
         raise NotImplementedError()
 
-    def validate(self, attrs):
-        given_names = [a.name for a, b in attrs['parameters']]
-        for parameter in attrs['operation'].parameters.filter(is_input=True, required=True):
-            if parameter.name not in given_names:
-                raise ValidationError("Parameter {} is required".format(parameter.name), code='required')
-        return attrs
-
     def create(self, validated_data):
-        run = Run(operation=validated_data['operation'])
+        run = Run()
         run.save()
-        for parameter_value_data in validated_data['parameters']:
-            ParameterValue.objects.create(
-                parameter=parameter_value_data[0],
-                _value=parameter_value_data[1],
-                run=run
-            )
-        run.parameter_set = validated_data['parameters']
+        for file_path in validated_data['files']:
+            file_path.run = run
+            file_path.save()
+        run.file_path_set = validated_data['files']
         run.save()
         return run
