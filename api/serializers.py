@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.parsers import JSONParser
-from .models import Run
-from .models import FilePath
+from run.models import Run
+from run.models import FilePath
 from storage.models import File
 from storage.serializers import FileSerializer
 
