@@ -22,7 +22,7 @@ class TestRunAPI(TestCase):
         data = JSONParser().parse(BytesIO(response.content))[0]
         self.assertTrue('id' in data)
         self.assertTrue('log' in data)
-        self.assertTrue('file_path_set' in data)
+        self.assertTrue('files' in data)
         self.assertEqual(data['end_time'], '2017-01-15T19:51:06Z')
         self.assertEqual(data['status'], 3)
 
