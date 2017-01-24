@@ -6,32 +6,24 @@ from storage.models import File
 from storage.serializers import FileSerializer
 
 
-class FilePathSerializer(serializers.ModelSerializer):
-    file = FileSerializer(many=False)
-
-    # definition = FileDefinitionSerializer()
-
-    class Meta:
-        model = FilePath
-        fields = ('file',
-                  # 'definition',
-                  )
-
-
-class RunReportSerializer(serializers.ModelSerializer):
-    file_path_set = FilePathSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Run
-        fields = (
-            # 'game',
-            'id', 'status', 'end_time', 'log', 'file_path_set')
-        read_only_fields = fields
-
+# class FilePathSerializer(serializers.ModelSerializer):
+#     file = FileSerializer(many=False)
+#
+#     # definition = FileDefinitionSerializer()
+#
+#     class Meta:
+#         model = FilePath
+#         fields = ('file',
+#                   # 'definition',
+#                   )
 
 class FilePathSetSerializerField(serializers.Field):
     def to_representation(self, value):
-        raise NotImplemented()
+        result = {}
+        for file_path in value:
+            # todo serialize file definition
+            result['client_1'] = file_path.file.id
+        return result
 
     def to_internal_value(self, data):
         internal_value = []
@@ -50,6 +42,22 @@ class FilePathSetSerializerField(serializers.Field):
         #         raise TypeError()
         #     for file_path in self.instance:
         #         file_paths.append(FilePathSerializer(file_path).data)
+
+
+class RunReportSerializer(serializers.ModelSerializer):
+    files = FilePathSetSerializerField(read_only=True)
+
+    class Meta:
+        model = Run
+        fields = (
+            # 'game',
+            'id', 'status', 'end_time', 'log', 'files')
+        read_only_fields = fields
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['files'] = FilePathSetSerializerField().to_representation(instance.file_path_set.all())
+        return data
 
 
 class RunCreateSerializer(serializers.Serializer):
