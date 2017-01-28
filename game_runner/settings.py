@@ -39,8 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'storage',
-    'authentication',
-    'rest_framework.authtoken',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -105,10 +104,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'authentication.authentication.TokenIPAuth',
+        'api.authentication.TokenIPAuth',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'api.permissions.IsAuthenticated',
     )
 }
 
