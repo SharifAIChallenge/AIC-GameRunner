@@ -24,11 +24,18 @@ import uuid
 #   +run((game : Game, file_paths : FilePath[])[]) : tokens String[]
 #   +report(from_time : DateTime) : runs : Run[]
 
-class FilePath(models.Model):
-    file = models.ForeignKey(File, default=None)
-    # definition = models.ForeignKey('FileDefinition') later should be uncommented
-    is_input = models.BooleanField()
-    run = models.ForeignKey('Run', related_name='file_path_set')
+class ParameterValue(models.Model):
+    _value = models.TextField()
+    run = models.ForeignKey('Run', related_name='parameter_value_set')
+    # parameter = models.ForeignKey('Parameter') later should be uncommented
+
+    @property
+    def value(self):
+        # if parameter.type == 'String':
+        #     return self._value
+        # else:
+        #     return File.objects.get(id=self._value)
+        return None
 
 
 class Run(models.Model):

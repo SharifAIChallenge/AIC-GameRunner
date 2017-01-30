@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.parsers import JSONParser
 from run.models import Run
-from run.models import FilePath
+from run.models import ParameterValue
 from storage.models import File
 from storage.serializers import FileSerializer
 
@@ -32,8 +32,8 @@ class FilePathSetSerializerField(serializers.Field):
         for file_definition in data:
             if 'id' not in data[file_definition]:
                 raise serializers.ValidationError('file id not provided.')
-            internal_value.append(FilePath(file=File.objects.get(id=data[file_definition]['id']),
-                                           is_input=True))
+            internal_value.append(ParameterValue(file=File.objects.get(id=data[file_definition]['id']),
+                                                 is_input=True))
         return internal_value
         #
         # def to_representation(self, value):

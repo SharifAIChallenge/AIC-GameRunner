@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework.parsers import JSONParser
 from io import BytesIO
 
-from run.models import Run, FilePath
+from run.models import Run, ParameterValue
 from storage.models import File
 
 
@@ -13,7 +13,7 @@ class TestRunAPI(TestCase):
         self.run_1.save()
         self.file_1 = File()
         self.file_1.save()
-        self.file_path_1 = FilePath(file=self.file_1, run=self.run_1, is_input=True)
+        self.file_path_1 = ParameterValue(file=self.file_1, run=self.run_1, is_input=True)
         self.file_path_1.save()
 
     def test_report_view(self):
