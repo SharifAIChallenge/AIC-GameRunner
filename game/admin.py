@@ -1,10 +1,9 @@
 from django.contrib import admin
 
 # Register your models here.
-from game.models import Competition, Game, Team, CompetitionLanguage, DockerContainer
+from game.models import *
 
-admin.site.register(Competition)
 admin.site.register(Game)
-admin.site.register(Team)
-admin.site.register(CompetitionLanguage)
-admin.site.register(DockerContainer)
+admin.site.register(Operation)
+admin.site.register(OperationParameter)
+admin.site.register(OperationResource)
