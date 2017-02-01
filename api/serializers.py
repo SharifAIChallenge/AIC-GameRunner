@@ -17,51 +17,44 @@ from storage.serializers import FileSerializer
 #                   # 'definition',
 #                   )
 
-class FilePathSetSerializerField(serializers.Field):
+class ParameterValueSetSerializerField(serializers.Field):
     def to_representation(self, value):
         result = {}
-        for file_path in value:
+        for parameter_value in value:
             # todo serialize file definition
-            result['client_1'] = file_path.file.id
+            result[parameter_value.parameter.name] = parameter_value._value
         return result
 
     def to_internal_value(self, data):
         internal_value = []
         if not isinstance(data, dict):
-            raise serializers.ValidationError('files data must be a dictionary.')
-        for file_definition in data:
-            if 'id' not in data[file_definition]:
-                raise serializers.ValidationError('file id not provided.')
-            internal_value.append(ParameterValue(file=File.objects.get(id=data[file_definition]['id']),
-                                                 is_input=True))
+            raise serializers.ValidationError('parameters data must be a dictionary.')
+            # todo add this
+            # for parameter in data:
+            # internal_value.append(
+            #     ParameterValue(parameter=Parameter.objects.get(name=parameter), _value=data[parameter],
+            #                    is_input=True))
         return internal_value
-        #
-        # def to_representation(self, value):
-        #     file_paths = []
-        #     if not isinstance(value, FilePath):
-        #         raise TypeError()
-        #     for file_path in self.instance:
-        #         file_paths.append(FilePathSerializer(file_path).data)
 
 
 class RunReportSerializer(serializers.ModelSerializer):
-    files = FilePathSetSerializerField(read_only=True)
+    parameters = ParameterValueSetSerializerField(read_only=True)
 
     class Meta:
         model = Run
         fields = (
             # 'game',
-            'id', 'status', 'end_time', 'log', 'files')
+            'id', 'status', 'end_time', 'log', 'parameters')
         read_only_fields = fields
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['files'] = FilePathSetSerializerField().to_representation(instance.file_path_set.all())
+        data['parameters'] = ParameterValueSetSerializerField().to_representation(instance.parameter_set.all())
         return data
 
 
 class RunCreateSerializer(serializers.Serializer):
-    files = FilePathSetSerializerField()
+    files = ParameterValueSetSerializerField()
 
     def update(self, instance, validated_data):
         raise NotImplementedError()
@@ -69,9 +62,9 @@ class RunCreateSerializer(serializers.Serializer):
     def create(self, validated_data):
         run = Run()
         run.save()
-        for file_path in validated_data['files']:
-            file_path.run = run
-            file_path.save()
-        run.file_path_set = validated_data['files']
+        for parameter_value in validated_data['parameters']:
+            parameter_value.run = run
+            parameter_value.save()
+        run.parameter_set = validated_data['parameters']
         run.save()
         return run
