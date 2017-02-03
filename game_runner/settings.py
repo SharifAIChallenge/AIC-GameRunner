@@ -125,3 +125,6 @@ MEDIA_ROOT = 'files/'
 
 # Project User Model
 AUTH_USER_MODEL = 'auth.User'
+
+# The path to nfs-folder synced across all instances. Appended to MEDIA_ROOT
+NFS_DIR = 'nfs/'

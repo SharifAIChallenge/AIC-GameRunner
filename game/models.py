@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 
 __all__ = ["Game", "Operation", "OperationResource", "OperationParameter"]
@@ -26,7 +27,7 @@ class Operation(models.Model):
 class OperationResource(models.Model):
     operation = models.ForeignKey(Operation, verbose_name=_("operation"))
     name = models.CharField(max_length=100, verbose_name=_("name"))
-    file = models.FileField(verbose_name=_("file"))
+    file = models.FileField(verbose_name=_("file"), upload_to=settings.NFS_DIR)
 
     class Meta:
         unique_together = (("operation", "name"), )
@@ -42,7 +43,7 @@ class OperationParameter(models.Model):
     name = models.CharField(max_length=100, verbose_name=_("name"))
     type = models.CharField(choices=PARAMETER_TYPES, verbose_name=_("type"), max_length=20)
     required = models.BooleanField(verbose_name=_("required"), default=True)
-    input_parameter = models.BooleanField(verbose_name=_("input parameter"))
+    is_input = models.BooleanField(verbose_name=_("is input?"))
 
     class Meta:
         unique_together = (("operation", "name"), )
