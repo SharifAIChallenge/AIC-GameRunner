@@ -33,8 +33,7 @@ class ParameterValueSetSerializerField(serializers.Field):
             raise serializers.ValidationError('parameters data must be a dictionary.')
             for parameter in data:
                 internal_value.append(
-                    ParameterValue(parameter=Parameter.objects.get(name=parameter), _value=data[parameter],
-                                   is_input=True))
+                    ParameterValue(parameter=Parameter.objects.get(name=parameter), _value=data[parameter]))
         return internal_value
 
 
