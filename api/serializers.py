@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from rest_framework.parsers import JSONParser
+
+from game.models import Operation
 from run.models import Run
 from run.models import ParameterValue
 from storage.models import File
@@ -29,38 +31,46 @@ class ParameterValueSetSerializerField(serializers.Field):
         internal_value = []
         if not isinstance(data, dict):
             raise serializers.ValidationError('parameters data must be a dictionary.')
-            # todo add this
-            # for parameter in data:
-            # internal_value.append(
-            #     ParameterValue(parameter=Parameter.objects.get(name=parameter), _value=data[parameter],
-            #                    is_input=True))
+            for parameter in data:
+                internal_value.append(
+                    ParameterValue(parameter=Parameter.objects.get(name=parameter), _value=data[parameter],
+                                   is_input=True))
         return internal_value
+
+
+class OperationSerializerFiled(serializers.Field):
+    def to_internal_value(self, data):
+        return Operation.objects.get(name=data)
+
+    def to_representation(self, value):
+        return value.name
 
 
 class RunReportSerializer(serializers.ModelSerializer):
     parameters = ParameterValueSetSerializerField(read_only=True)
+    operation = OperationSerializerFiled()
 
     class Meta:
         model = Run
         fields = (
-            # 'game',
-            'id', 'status', 'end_time', 'log', 'parameters')
+            'id', 'operation', 'status', 'end_time', 'log', 'parameters')
         read_only_fields = fields
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['parameters'] = ParameterValueSetSerializerField().to_representation(instance.parameter_set.all())
+        data['parameters'] = ParameterValueSetSerializerField().to_representation(instance.parameter_value_set.all())
         return data
 
 
 class RunCreateSerializer(serializers.Serializer):
-    files = ParameterValueSetSerializerField()
+    parameters = ParameterValueSetSerializerField()
+    operation = OperationSerializerFiled()
 
     def update(self, instance, validated_data):
         raise NotImplementedError()
 
     def create(self, validated_data):
-        run = Run()
+        run = Run(operation=validated_data['operation'])
         run.save()
         for parameter_value in validated_data['parameters']:
             parameter_value.run = run
