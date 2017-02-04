@@ -1,45 +1,27 @@
 from django.db import models
 from storage.models import File
 from game_runner import settings
+from game.models import OperationParameter, Game, Operation
 import uuid
 
-
-# Initial scheme
-# FilePath
-#   +file : File
-#   +path : String
-#   +run : Run
-#
-# Run
-#   +token : Token
-#   +request_time : DateTime
-#   +start_time : DateTime
-#   +end_time : DateTime
-#   +input_file_paths : FilePath[]
-#   +output_file_paths : FilePath[]
-#   +log : File
-#   +game : Game
-#
-# API Methods:
-#   +run((game : Game, file_paths : FilePath[])[]) : tokens String[]
-#   +report(from_time : DateTime) : runs : Run[]
 
 class ParameterValue(models.Model):
     _value = models.TextField()
     run = models.ForeignKey('Run', related_name='parameter_value_set')
-    # parameter = models.ForeignKey('Parameter') later should be uncommented
+    parameter = models.ForeignKey(OperationParameter)
 
     @property
     def value(self):
-        # if parameter.type == 'String':
-        #     return self._value
-        # else:
-        #     return File.objects.get(id=self._value)
+        if self.parameter.type == OperationParameter.PARAMETER_TYPES['string']:
+            return self._value
+        else:
+            return File.objects.get(id=self._value)
         return None
 
 
 class Run(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    operation = models.ForeignKey(Operation)
     request_time = models.DateTimeField(auto_now_add=True, null=True)
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
@@ -55,4 +37,4 @@ class Run(models.Model):
         (PENDING, 'Pending'),
     )
     status = models.SmallIntegerField(choices=status_choices, default=PENDING)
-    # game = Game()
+
