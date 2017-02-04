@@ -29,7 +29,6 @@ class TestRunAPI(TestCase):
         response = self.client.post('/api/run/report', data='{"from_time": "2017-01-15 19:51:06"}',
                                     content_type='application/json')
         data = JSONParser().parse(BytesIO(response.content))[0]
-        print(data)
         self.assertTrue('id' in data)
         self.assertTrue('log' in data)
         self.assertTrue('parameters' in data)
