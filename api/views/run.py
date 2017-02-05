@@ -30,14 +30,10 @@ class RunReportView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
         # todo put the last time report view is called as default for 'time' param.
-        from_time = None
-        if 'from_time' in data:
-            from_time = data['from_time']
+        if 'time' in data:
+            from_time = data['time']
         else:
-            if 'time' in data:
-                from_time = data['time']
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         runs = Run.objects.all().filter(end_time__gte=from_time)
         result = []
         for run in runs:
