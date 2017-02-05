@@ -17,13 +17,18 @@ class TestRunAPI(TestCase):
         self.operation_1.save()
         self.operation_parameter_1 = OperationParameter(operation=self.operation_1, name='client_1', type='file',
                                                         required=True, is_input=True)
+        self.operation_parameter_2 = OperationParameter(operation=self.operation_1, name='log', type='file',
+                                                        required=False, is_input=False)
         self.operation_parameter_1.save()
+        self.operation_parameter_2.save()
         self.run_1 = Run(start_time='2017-01-15 19:51:06', end_time='2017-01-15T19:51:06Z', operation=self.operation_1)
         self.run_1.save()
         self.file_1 = File()
         self.file_1.save()
         self.param_value_1 = ParameterValue(run=self.run_1, parameter=self.operation_parameter_1, _value=self.file_1.id)
+        self.param_value_2 = ParameterValue(run=self.run_1, parameter=self.operation_parameter_2, _value=self.file_1.id)
         self.param_value_1.save()
+        self.param_value_2.save()
 
     def test_report_view(self):
         response = self.client.post('/api/run/report', data='{"from_time": "2017-01-15 19:51:06"}',
@@ -32,7 +37,20 @@ class TestRunAPI(TestCase):
         self.assertTrue('id' in data)
         self.assertTrue('log' in data)
         self.assertTrue('parameters' in data)
-        self.assertTrue('client_1' in data['parameters'])
+        self.assertFalse('client_1' in data['parameters'])
+        self.assertTrue('log' in data['parameters'])
+        self.assertEqual(data['end_time'], '2017-01-15T19:51:06Z')
+        self.assertEqual(data['status'], 3)
+
+    def test_report_view_backward_compatibility(self):
+        response = self.client.post('/api/run/report', data='{"time": "2017-01-15 19:51:06"}',
+                                    content_type='application/json')
+        data = JSONParser().parse(BytesIO(response.content))[0]
+        self.assertTrue('id' in data)
+        self.assertTrue('log' in data)
+        self.assertTrue('parameters' in data)
+        self.assertFalse('client_1' in data['parameters'])
+        self.assertTrue('log' in data['parameters'])
         self.assertEqual(data['end_time'], '2017-01-15T19:51:06Z')
         self.assertEqual(data['status'], 3)
 
