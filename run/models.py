@@ -18,6 +18,15 @@ class ParameterValue(models.Model):
             return File.objects.get(id=self._value)
         return None
 
+    @value.setter
+    def value(self, value):
+        if self.parameter.type == OperationParameter.PARAMETER_TYPES['string']:
+            self._value = value
+        else:
+            if not isinstance(value, File):
+                raise ValueError()
+            self._value = value.pk
+
 
 class Run(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
