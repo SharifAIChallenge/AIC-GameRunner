@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'auth',
     'api',
     'game',
+    'run',
 ]
 
 MIDDLEWARE = [
