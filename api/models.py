@@ -23,7 +23,8 @@ class Token(models.Model):
         return super(Token, self).save(*args, **kwargs)
 
     # TODO: Generate tokens in a proper way
-    def generate_key(self):
+    @staticmethod
+    def generate_key():
         return binascii.hexlify(os.urandom(20)).decode()
 
     def __str__(self):
