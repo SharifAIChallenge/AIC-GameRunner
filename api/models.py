@@ -10,11 +10,10 @@ from django.utils.translation import ugettext_lazy as _
 @python_2_unicode_compatible
 class Token(models.Model):
     key = models.CharField(_("Key"), max_length=40, primary_key=True)
-    ip_stricted = models.BooleanField(null=False, default=True, blank=False)
+    ip_restricted = models.BooleanField(null=False, default=True, blank=False)
     created = models.DateTimeField(_("Created"), auto_now_add=True)
 
     class Meta:
-        abstract = 'api' not in settings.INSTALLED_APPS
         verbose_name = _("Token")
         verbose_name_plural = _("Tokens")
 
@@ -23,6 +22,7 @@ class Token(models.Model):
             self.key = self.generate_key()
         return super(Token, self).save(*args, **kwargs)
 
+    # TODO: Generate tokens in a proper way
     def generate_key(self):
         return binascii.hexlify(os.urandom(20)).decode()
 
@@ -30,7 +30,8 @@ class Token(models.Model):
         return self.key
 
 
-class IP(models.Model):
+# TODO: Add a way to work with a range of IPs
+class IPBinding(models.Model):
     ip = models.GenericIPAddressField(null=False, blank=False)
     token = models.ForeignKey(
         Token, related_name='IP',

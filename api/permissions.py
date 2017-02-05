@@ -7,5 +7,5 @@ class IsAuthenticated(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.auth
+        return request.auth is not None
 

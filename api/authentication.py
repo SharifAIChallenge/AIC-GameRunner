@@ -1,10 +1,10 @@
 from rest_framework import exceptions
-from rest_framework.authentication import TokenAuthentication, get_authorization_header
-from api.models import Token, IP
+from rest_framework.authentication import get_authorization_header, BaseAuthentication
+from api.models import Token, IPBinding
 
 
-class TokenIPAuth(TokenAuthentication):
-    model = Token
+class TokenIPAuth(BaseAuthentication):
+    keyword = 'TokenIP'
 
     def authenticate(self, request):
         auth = get_authorization_header(request).split()
@@ -24,17 +24,18 @@ class TokenIPAuth(TokenAuthentication):
         except UnicodeError:
             msg = _('Invalid token header. Token string should not contain invalid characters.')
             raise exceptions.AuthenticationFailed(msg)
+        ip = request.META.get('REMOTE_ADDR')
 
-        model = self.get_model()
+        return self.authenticate_credentials(key, ip)
+
+    def authenticate_credentials(self, key, ip):
         try:
             token = Token.objects.get(key=key)
-        except model.DoesNotExist:
+        except Token.DoesNotExist:
             raise exceptions.AuthenticationFailed(_('Invalid token.'))
-        if token.ip_stricted:
-            ip = request.META.get('REMOTE_ADDR')
-            try:
-                token.IP.get(ip=ip)
-            except model.DoesNotExist:
-                raise exceptions.AuthenticationFailed(_('Invalid token.'))
+        if token.ip_restricted and token.ip_set.filter(ip=ip).count() == 0:
+            raise exceptions.AuthenticationFailed(_('token does not match this ip'))
+        return None, Token
 
-        return None, True
+    def authenticate_header(self, request):
+        return self.keyword
