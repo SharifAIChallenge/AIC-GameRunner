@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'storage',
+    'auth',
     'api',
+    'game',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +135,6 @@ MEDIA_ROOT = 'files/'
 
 # Project User Model
 AUTH_USER_MODEL = 'auth.User'
+
+# The path to nfs-folder synced across all instances. Appended to MEDIA_ROOT
+NFS_DIR = 'nfs/'
