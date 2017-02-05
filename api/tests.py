@@ -31,18 +31,6 @@ class TestRunAPI(TestCase):
         self.param_value_2.save()
 
     def test_report_view(self):
-        response = self.client.post('/api/run/report', data='{"from_time": "2017-01-15 19:51:06"}',
-                                    content_type='application/json')
-        data = JSONParser().parse(BytesIO(response.content))[0]
-        self.assertTrue('id' in data)
-        self.assertTrue('log' in data)
-        self.assertTrue('parameters' in data)
-        self.assertFalse('client_1' in data['parameters'])
-        self.assertTrue('log' in data['parameters'])
-        self.assertEqual(data['end_time'], '2017-01-15T19:51:06Z')
-        self.assertEqual(data['status'], 3)
-
-    def test_report_view_backward_compatibility(self):
         response = self.client.post('/api/run/report', data='{"time": "2017-01-15 19:51:06"}',
                                     content_type='application/json')
         data = JSONParser().parse(BytesIO(response.content))[0]
