@@ -55,7 +55,7 @@ class RunReportSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def to_representation(self, instance):
-        data = super().to_representation(instance)
+        data = super(RunReportSerializer, self).to_representation(instance)
         data['parameters'] = ParameterValueSetSerializerField().to_representation(
             instance.parameter_value_set.all().filter(parameter__is_input=False))
         return data
@@ -72,9 +72,11 @@ class RunCreateSerializer(serializers.Serializer):
         run = Run(operation=validated_data['operation'])
         run.save()
         for parameter_value_data in validated_data['parameters']:
-            parameter_value = ParameterValue(parameter=parameter_value_data[0], _value=parameter_value_data[1])
-            parameter_value.run = run
-            parameter_value.save()
+            ParameterValue.objects.create(
+                parameter=parameter_value_data[0],
+                _value=parameter_value_data[1],
+                run=run
+            )
         run.parameter_set = validated_data['parameters']
         run.save()
         return run
