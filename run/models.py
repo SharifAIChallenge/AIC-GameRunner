@@ -2,6 +2,9 @@ from django.db import models
 from storage.models import File
 from game_runner import settings
 from game.models import OperationParameter, Game, Operation
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from run.tasks import run
 import uuid
 
 
@@ -34,6 +37,7 @@ class Run(models.Model):
     request_time = models.DateTimeField(auto_now_add=True, null=True)
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
+    queue_reference_id = models.CharField(null=True, max_length=200)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
     log = models.TextField()
     # choices for the status
@@ -43,7 +47,16 @@ class Run(models.Model):
     status_choices = (
         (SUCCESS, 'Success'),
         (FAILURE, 'Failure'),
-        (PENDING, 'Pending'),
+        (PENDING, 'Pending '),
     )
     status = models.SmallIntegerField(choices=status_choices, default=PENDING)
 
+    def run(self):
+        pass
+
+
+@receiver(post_save, sender=Run)
+def run_handler(instance, **kwargs):
+    if instance.queue_reference_id is None:
+        instance.queue_reference_id = run.delay(instance.pk)
+        instance.save()
