@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'storage',
+    'api',
     'game',
     'run',
 ]
@@ -103,6 +104,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'api.authentication.TokenIPAuth',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'api.permissions.IsAuthenticated',
+    )
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
