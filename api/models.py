@@ -35,7 +35,7 @@ class Token(models.Model):
 class IPBinding(models.Model):
     ip = models.GenericIPAddressField(null=False, blank=False)
     token = models.ForeignKey(
-        Token, related_name='IP',
+        Token, related_name='ip_set',
         on_delete=models.CASCADE,
         name="Token"
     )

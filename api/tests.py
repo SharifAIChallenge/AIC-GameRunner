@@ -1,4 +1,5 @@
 from django.test import TestCase
+from rest_framework import exceptions
 from rest_framework.parsers import JSONParser
 from io import BytesIO
 
@@ -84,23 +85,23 @@ class TestRunAPI(TestCase):
         self.safe_authorize()
         response = self.client.post('/api/run/report', data='{"time": "2017-01-15 19:51:06"}',
                                     content_type='application/json')
-        self.assertNotEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     def test_invalid_token_authorization(self):
         response = self.client.post('/api/run/report', data='{"time": "2017-01-15 19:51:06"}',
                                     content_type='application/json', HTTP_AUTHORIZATION='Token ' + 'fakeToken')
-        self.assertEqual(response.status_code, 403)
+        self.assertRaises(exceptions.AuthenticationFailed)
 
     # checks that locally restricted token works when the client is local
     def test_locally_restricted_token_authorization(self):
         response = self.client.post('/api/run/report', data='{"time": "2017-01-15 19:51:06"}',
                                     content_type='application/json',
                                     HTTP_AUTHORIZATION='Token ' + self.local_restricted_token.key)
-        self.assertNotEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     # checks that non locally restricted token does not works when the client is local
     def test_non_locally_restricted_token_authorization(self):
         response = self.client.post('/api/run/report', data='{"time": "2017-01-15 19:51:06"}',
                                     content_type='application/json',
                                     HTTP_AUTHORIZATION='Token ' + self.nonlocal_restricted_token.key)
-        self.assertEqual(response.status_code, 403)
+        self.assertRaises(exceptions.AuthenticationFailed)
