@@ -9,6 +9,7 @@ import uuid
 import tempfile
 import os
 import shutil
+import yaml
 
 
 class ParameterValue(models.Model):
@@ -129,7 +130,27 @@ class Run(models.Model):
                     file.write(rendered_compose_file)
 
             # Section 4: Provide config file to the manager node and run it
-            pass
+            memlim_sum = 0.0
+            cpulim_sum = 0.0
+            with open(compiled_compose_file_path) as file:
+                compose = yaml.load(file)
+                for name in compose['services'] :
+                    x = compose['services'][name]['deploy']['resources']['limits']
+                    cpulim_sum += float(x['cpus'])
+                    s = x['memory']
+                    if __name__ == '__main__':
+                        if s[-1] == 'K':
+                            memlim_sum += int(s[:-1])
+                        elif s[-1] == 'M':
+                            memlim_sum += int(s[-1]) * 1024
+                        elif s[-1] == 'G':
+                            memlim_sum += int(s[-1]) * 1024 * 1024
+                        else:
+                            raise TypeError
+
+                # docker service create ...
+
+                #while [ 1 -ne `docker service ps $name | tail -n +2 | awk '{print $5}' | grep Shutdown | wc -l` ] ; do sleep 0.5; done
 
         # Section 5: Save outputs. Set run status to success
         for parameter in output_parameters:

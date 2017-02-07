@@ -1,0 +1,17 @@
+services:
+  sleep1:
+    deploy:
+      resources:
+        limits: {cpus: '0.1'}
+        reservations: {cpus: '0.5'}
+    image: ubuntu
+    entrypoint: sleep 10
+  sleep2:
+    deploy:
+      resources:
+        limits: {cpus: '0.1'}
+        reservations: {cpus: '0.5'}
+    image: ubuntu
+    entrypoint: sleep 5
+version: '3'
+
