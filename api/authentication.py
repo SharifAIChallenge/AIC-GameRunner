@@ -1,7 +1,8 @@
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.authentication import get_authorization_header, BaseAuthentication
-from api.models import Token, IPBinding
-from django.utils.translation import ugettext_lazy as _
+
+from api.models import Token
 
 
 class TokenIPAuth(BaseAuthentication):

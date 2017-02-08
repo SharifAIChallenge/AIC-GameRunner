@@ -1,2 +1,6 @@
 Django==1.10.5
 djangorestframework==3.5.3
+docker==2.0.2
+docker-pycreds==0.2.1
+six==1.10.0
+websocket-client==0.40.0

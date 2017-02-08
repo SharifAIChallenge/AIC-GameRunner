@@ -1,8 +1,10 @@
-from django.db import models
-from storage.models import File
-from game_runner import settings
-from game.models import OperationParameter, Game, Operation
 import uuid
+
+from django.db import models
+
+from game.models import OperationParameter, Game, Operation
+from game_runner import settings
+from storage.models import File
 
 
 class ParameterValue(models.Model):
@@ -46,4 +48,3 @@ class Run(models.Model):
         (PENDING, 'Pending'),
     )
     status = models.SmallIntegerField(choices=status_choices, default=PENDING)
-

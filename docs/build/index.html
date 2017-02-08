@@ -1,187 +1,217 @@
 <!doctype html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Middle Brain API Reference</title>
 
     <style>
-      .highlight table td { padding: 5px; }
-.highlight table pre { margin: 0; }
-.highlight, .highlight .w {
-  color: #f8f8f2;
-  background-color: #272822;
-}
-.highlight .err {
-  color: #272822;
-  background-color: #f92672;
-}
-.highlight .c, .highlight .cd, .highlight .cm, .highlight .c1, .highlight .cs {
-  color: #75715e;
-}
-.highlight .cp {
-  color: #f4bf75;
-}
-.highlight .nt {
-  color: #f4bf75;
-}
-.highlight .o, .highlight .ow {
-  color: #f8f8f2;
-}
-.highlight .p, .highlight .pi {
-  color: #f8f8f2;
-}
-.highlight .gi {
-  color: #a6e22e;
-}
-.highlight .gd {
-  color: #f92672;
-}
-.highlight .gh {
-  color: #66d9ef;
-  background-color: #272822;
-  font-weight: bold;
-}
-.highlight .k, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kv {
-  color: #ae81ff;
-}
-.highlight .kc {
-  color: #fd971f;
-}
-.highlight .kt {
-  color: #fd971f;
-}
-.highlight .kd {
-  color: #fd971f;
-}
-.highlight .s, .highlight .sb, .highlight .sc, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .s1 {
-  color: #a6e22e;
-}
-.highlight .sr {
-  color: #a1efe4;
-}
-.highlight .si {
-  color: #cc6633;
-}
-.highlight .se {
-  color: #cc6633;
-}
-.highlight .nn {
-  color: #f4bf75;
-}
-.highlight .nc {
-  color: #f4bf75;
-}
-.highlight .no {
-  color: #f4bf75;
-}
-.highlight .na {
-  color: #66d9ef;
-}
-.highlight .m, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mb, .highlight .mx {
-  color: #a6e22e;
-}
-.highlight .ss {
-  color: #a6e22e;
-}
-    </style>
-    <link href="stylesheets/screen.css" rel="stylesheet" media="screen" />
-    <link href="stylesheets/print.css" rel="stylesheet" media="print" />
-      <script src="javascripts/all.js"></script>
-  </head>
+        .highlight table td {
+            padding: 5px;
+        }
 
-  <body class="index" data-languages="[]">
-    <a href="#" id="nav-button">
+        .highlight table pre {
+            margin: 0;
+        }
+
+        .highlight, .highlight .w {
+            color: #f8f8f2;
+            background-color: #272822;
+        }
+
+        .highlight .err {
+            color: #272822;
+            background-color: #f92672;
+        }
+
+        .highlight .c, .highlight .cd, .highlight .cm, .highlight .c1, .highlight .cs {
+            color: #75715e;
+        }
+
+        .highlight .cp {
+            color: #f4bf75;
+        }
+
+        .highlight .nt {
+            color: #f4bf75;
+        }
+
+        .highlight .o, .highlight .ow {
+            color: #f8f8f2;
+        }
+
+        .highlight .p, .highlight .pi {
+            color: #f8f8f2;
+        }
+
+        .highlight .gi {
+            color: #a6e22e;
+        }
+
+        .highlight .gd {
+            color: #f92672;
+        }
+
+        .highlight .gh {
+            color: #66d9ef;
+            background-color: #272822;
+            font-weight: bold;
+        }
+
+        .highlight .k, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kv {
+            color: #ae81ff;
+        }
+
+        .highlight .kc {
+            color: #fd971f;
+        }
+
+        .highlight .kt {
+            color: #fd971f;
+        }
+
+        .highlight .kd {
+            color: #fd971f;
+        }
+
+        .highlight .s, .highlight .sb, .highlight .sc, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .s1 {
+            color: #a6e22e;
+        }
+
+        .highlight .sr {
+            color: #a1efe4;
+        }
+
+        .highlight .si {
+            color: #cc6633;
+        }
+
+        .highlight .se {
+            color: #cc6633;
+        }
+
+        .highlight .nn {
+            color: #f4bf75;
+        }
+
+        .highlight .nc {
+            color: #f4bf75;
+        }
+
+        .highlight .no {
+            color: #f4bf75;
+        }
+
+        .highlight .na {
+            color: #66d9ef;
+        }
+
+        .highlight .m, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mb, .highlight .mx {
+            color: #a6e22e;
+        }
+
+        .highlight .ss {
+            color: #a6e22e;
+        }
+    </style>
+    <link href="stylesheets/screen.css" rel="stylesheet" media="screen"/>
+    <link href="stylesheets/print.css" rel="stylesheet" media="print"/>
+    <script src="javascripts/all.js"></script>
+</head>
+
+<body class="index" data-languages="[]">
+<a href="#" id="nav-button">
       <span>
         NAV
-        <img src="images/navbar.png" alt="Navbar" />
+        <img src="images/navbar.png" alt="Navbar"/>
       </span>
-    </a>
-    <div class="tocify-wrapper">
-      <img src="images/logo.png" alt="Logo" />
-        <div class="search">
-          <input type="text" class="search" id="input-search" placeholder="Search">
-        </div>
-        <ul class="search-results"></ul>
-      <div id="toc">
-      </div>
-        <ul class="toc-footer">
-            <li><a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a></li>
-        </ul>
+</a>
+<div class="tocify-wrapper">
+    <img src="images/logo.png" alt="Logo"/>
+    <div class="search">
+        <input type="text" class="search" id="input-search" placeholder="Search">
     </div>
-    <div class="page-wrapper">
-      <div class="dark-box"></div>
-      <div class="content">
+    <ul class="search-results"></ul>
+    <div id="toc">
+    </div>
+    <ul class="toc-footer">
+        <li><a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a></li>
+    </ul>
+</div>
+<div class="page-wrapper">
+    <div class="dark-box"></div>
+    <div class="content">
         <h1 id="authentication">Authentication</h1>
 
-<p>MiddleBrain uses a token to authenticate requests. It excepts the token to be
-included in all API requests. Token generation can be done by the system admin.
-Tokens may be bound to one or more IP addresses, in which case they only
-authenticate successfully if the request is made through one of those addresses.</p>
-<pre class="highlight plaintext"><code># With shell, you can just pass the correct header with each request
+        <p>MiddleBrain uses a token to authenticate requests. It excepts the token to be
+            included in all API requests. Token generation can be done by the system admin.
+            Tokens may be bound to one or more IP addresses, in which case they only
+            authenticate successfully if the request is made through one of those addresses.</p>
+        <pre class="highlight plaintext"><code># With shell, you can just pass the correct header with each request
 curl "api_endpoint_here"
   -H "Authorization: &lt;your_token_goes_here&gt;"
 </code></pre>
-<h1 id="api-commands">API commands</h1>
+        <h1 id="api-commands">API commands</h1>
 
-<p>The description given in each section,
-assumes that the authentication is successful. In case of authentication failure,
-a 401 or 403 error is returned.</p>
+        <p>The description given in each section,
+            assumes that the authentication is successful. In case of authentication failure,
+            a 401 or 403 error is returned.</p>
 
-<p>If the request is not in the format described in the request section
-of the command, a 400 error is returned.</p>
+        <p>If the request is not in the format described in the request section
+            of the command, a 400 error is returned.</p>
 
-<h2 id="files">Files</h2>
+        <h2 id="files">Files</h2>
 
-<h3 id="upload">Upload</h3>
+        <h3 id="upload">Upload</h3>
 
-<h4 id="url">URL:</h4>
+        <h4 id="url">URL:</h4>
 
-<aside>/storage/new_file/</aside>
+        <aside>/storage/new_file/</aside>
 
-<h4 id="request">Request:</h4>
+        <h4 id="request">Request:</h4>
 
-<p>Post the file as the body of the request.</p>
+        <p>Post the file as the body of the request.</p>
 
-<h4 id="response">Response:</h4>
+        <h4 id="response">Response:</h4>
 
-<p>The response is a JSON encoded dictionary containing the following keywords:</p>
+        <p>The response is a JSON encoded dictionary containing the following keywords:</p>
 
-<ul>
-<li>token: A string to reference the file in future requests.</li>
-</ul>
+        <ul>
+            <li>token: A string to reference the file in future requests.</li>
+        </ul>
 
-<h3 id="download">Download</h3>
+        <h3 id="download">Download</h3>
 
-<h4 id="url">URL:</h4>
+        <h4 id="url">URL:</h4>
 
-<aside>/storage/get_file/</aside>
+        <aside>/storage/get_file/</aside>
 
-<h4 id="request">Request:</h4>
+        <h4 id="request">Request:</h4>
 
-<p>The request should be a JSON encoded dictionary containing the following
-keywords:</p>
+        <p>The request should be a JSON encoded dictionary containing the following
+            keywords:</p>
 
-<ul>
-<li>token: A string used for referencing the file obtained in previous requests
-to the API.</li>
-</ul>
+        <ul>
+            <li>token: A string used for referencing the file obtained in previous requests
+                to the API.
+            </li>
+        </ul>
 
-<h4 id="response">Response:</h4>
+        <h4 id="response">Response:</h4>
 
-<p>The file is served as the response.</p>
+        <p>The file is served as the response.</p>
 
-<h2 id="game">Game</h2>
+        <h2 id="game">Game</h2>
 
-<h3 id="run">Run</h3>
+        <h3 id="run">Run</h3>
 
-<h4 id="url">URL:</h4>
+        <h4 id="url">URL:</h4>
 
-<aside>/game/run/</aside>
+        <aside>/game/run/</aside>
 
-<h4 id="request">Request:</h4>
-<pre class="highlight plaintext"><code>[{
+        <h4 id="request">Request:</h4>
+        <pre class="highlight plaintext"><code>[{
   "game": "AIC17",
   "section": "play",
   "parameters": {
@@ -191,118 +221,125 @@ to the API.</li>
   }
 }]
 </code></pre>
-<p>TYPE: POST</p>
+        <p>TYPE: POST</p>
 
-<p>The request should be a JSON encoded <strong>list of dictionaries</strong>
- each representing a separate Run, containing the following keywords:</p>
+        <p>The request should be a JSON encoded <strong>list of dictionaries</strong>
+            each representing a separate Run, containing the following keywords:</p>
 
-<ul>
-<li>game: The name of the game for this run. e.g. SharifAIC17</li>
-<li>section: The section of the game for this run. e.g. compile, play.</li>
-<li>parameters: a dictionary containing the parameters for this section.</li>
-</ul>
+        <ul>
+            <li>game: The name of the game for this run. e.g. SharifAIC17</li>
+            <li>section: The section of the game for this run. e.g. compile, play.</li>
+            <li>parameters: a dictionary containing the parameters for this section.</li>
+        </ul>
 
-<h4 id="response">Response:</h4>
+        <h4 id="response">Response:</h4>
 
-<p>The response is a JSON encoded <strong>list of dictionaries</strong>, each describing the status
-for creating the Run described by the element in the same place in the request.</p>
+        <p>The response is a JSON encoded <strong>list of dictionaries</strong>, each describing the status
+            for creating the Run described by the element in the same place in the request.</p>
 
-<p>Each dictionary contains the following keyword:</p>
+        <p>Each dictionary contains the following keyword:</p>
 
-<ul>
-<li>success: A boolean indicating whether the Run was created successfully.</li>
-</ul>
+        <ul>
+            <li>success: A boolean indicating whether the Run was created successfully.</li>
+        </ul>
 
-<p>In case success is true the dictionary contains the following keywords as well.</p>
+        <p>In case success is true the dictionary contains the following keywords as well.</p>
 
-<ul>
-<li>token: A token to be used for referencing this run in future API requests.</li>
-</ul>
+        <ul>
+            <li>token: A token to be used for referencing this run in future API requests.</li>
+        </ul>
 
-<p>In case success is false the dictionary contains the following keywords as well.</p>
+        <p>In case success is false the dictionary contains the following keywords as well.</p>
 
-<ul>
-<li>errors: Errors preventing creation of the Run.</li>
-</ul>
+        <ul>
+            <li>errors: Errors preventing creation of the Run.</li>
+        </ul>
 
-<h3 id="report">Report</h3>
+        <h3 id="report">Report</h3>
 
-<h3 id="url">URL:</h3>
+        <h3 id="url">URL:</h3>
 
-<aside>/game/report/</aside>
+        <aside>/game/report/</aside>
 
-<h3 id="request">Request:</h3>
+        <h3 id="request">Request:</h3>
 
-<p>TYPE: GET</p>
+        <p>TYPE: GET</p>
 
-<p>You may use <code class="prettyprint">time</code> field to specify time.
-Otherwise last request to this page will be considered as <code class="prettyprint">time</code>.</p>
+        <p>You may use <code class="prettyprint">time</code> field to specify time.
+            Otherwise last request to this page will be considered as <code class="prettyprint">time</code>.</p>
 
-<h3 id="response">Response:</h3>
+        <h3 id="response">Response:</h3>
 
-<p>A list of dictionaries of completed runs after <code class="prettyprint">time</code>. Each dictionary contains
-the following keywords:</p>
+        <p>A list of dictionaries of completed runs after <code class="prettyprint">time</code>. Each dictionary
+            contains
+            the following keywords:</p>
 
-<ul>
-<li>token</li>
-<li>success: A boolean indicating whether the run was completed successfully.</li>
-</ul>
+        <ul>
+            <li>token</li>
+            <li>success: A boolean indicating whether the run was completed successfully.</li>
+        </ul>
 
-<p>In case success is false the dictionary contains the following keywords as well.</p>
+        <p>In case success is false the dictionary contains the following keywords as well.</p>
 
-<ul>
-<li>errors</li>
-</ul>
+        <ul>
+            <li>errors</li>
+        </ul>
 
-<p>In case success is true the dictionary contains the following keywords as well.</p>
+        <p>In case success is true the dictionary contains the following keywords as well.</p>
 
-<ul>
-<li>parameters: A dictionary containing the output parameters of the run.
-Tokens are returned for files. You may download each file separately through
-the API.</li>
-</ul>
+        <ul>
+            <li>parameters: A dictionary containing the output parameters of the run.
+                Tokens are returned for files. You may download each file separately through
+                the API.
+            </li>
+        </ul>
 
-          <h1 id="errors">Errors</h1>
+        <h1 id="errors">Errors</h1>
 
-<table><thead>
-<tr>
-<th>Error Code</th>
-<th>Meaning</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>400</td>
-<td>Bad Request &ndash; Your request has some problems. Check the format.</td>
-</tr>
-<tr>
-<td>401</td>
-<td>Unauthorized &ndash; Your API key is wrong</td>
-</tr>
-<tr>
-<td>403</td>
-<td>Forbidden</td>
-</tr>
-<tr>
-<td>404</td>
-<td>Not Found</td>
-</tr>
-<tr>
-<td>405</td>
-<td>Method Not Allowed</td>
-</tr>
-<tr>
-<td>500</td>
-<td>Internal Server Error &ndash; We had a problem with our server. Try again later.</td>
-</tr>
-<tr>
-<td>503</td>
-<td>Service Unavailable &ndash; We&rsquo;re temporarially offline for maintanance. Please try again later.</td>
-</tr>
-</tbody></table>
+        <table>
+            <thead>
+            <tr>
+                <th>Error Code</th>
+                <th>Meaning</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>400</td>
+                <td>Bad Request &ndash; Your request has some problems. Check the format.</td>
+            </tr>
+            <tr>
+                <td>401</td>
+                <td>Unauthorized &ndash; Your API key is wrong</td>
+            </tr>
+            <tr>
+                <td>403</td>
+                <td>Forbidden</td>
+            </tr>
+            <tr>
+                <td>404</td>
+                <td>Not Found</td>
+            </tr>
+            <tr>
+                <td>405</td>
+                <td>Method Not Allowed</td>
+            </tr>
+            <tr>
+                <td>500</td>
+                <td>Internal Server Error &ndash; We had a problem with our server. Try again later.</td>
+            </tr>
+            <tr>
+                <td>503</td>
+                <td>Service Unavailable &ndash; We&rsquo;re temporarially offline for maintanance. Please try again
+                    later.
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-      </div>
-      <div class="dark-box">
-      </div>
     </div>
-  </body>
+    <div class="dark-box">
+    </div>
+</div>
+</body>
 </html>

@@ -1,11 +1,13 @@
 import os
+
 from django.http import HttpResponse
 from rest_framework import status
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import FormParser, MultiPartParser
-from storage.serializers import FileSerializer
+
 from storage.models import File
+from storage.serializers import FileSerializer
 
 
 class FileUploadView(APIView):

@@ -1,8 +1,8 @@
+from io import BytesIO
+
 from django.test import TestCase
 from rest_framework import exceptions
 from rest_framework.parsers import JSONParser
-from io import BytesIO
-
 from rest_framework.test import APIClient
 
 from api.models import Token, IPBinding

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-
 
 __all__ = ["Game", "Operation", "OperationResource", "OperationParameter"]
 
@@ -18,7 +17,7 @@ class Operation(models.Model):
     config = models.TextField(verbose_name=_("docker compose yml template"), null=False)
 
     class Meta:
-        unique_together = (("game", "name"), )
+        unique_together = (("game", "name"),)
 
     def __unicode__(self):
         return self.name
@@ -30,7 +29,7 @@ class OperationResource(models.Model):
     file = models.FileField(verbose_name=_("file"), upload_to=settings.NFS_DIR)
 
     class Meta:
-        unique_together = (("operation", "name"), )
+        unique_together = (("operation", "name"),)
 
 
 class OperationParameter(models.Model):
@@ -46,4 +45,4 @@ class OperationParameter(models.Model):
     is_input = models.BooleanField(verbose_name=_("is input?"))
 
     class Meta:
-        unique_together = (("operation", "name"), )
+        unique_together = (("operation", "name"),)
