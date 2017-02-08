@@ -41,19 +41,20 @@ class ParameterValue(models.Model):
                 raise ValueError()
             self._value = value.pk
 
-    def compile_for_input(self, parameter_path):
+    def compile_for_input(self, dir):
         """
         If the parameter is a string, this method
-        stores it in the parameter_path.
-        If the parameter is a file, it copies
-        the file to the given path.
+        returns the value
+        If the parameter is a file, it copies it to
+        a file inside `dir` and returns the path.
         """
         if self.parameter.is_input:
             if self.parameter.type == 'string':
-                with open(parameter_path, "w") as file:
-                    file.write(self.value)
+                return self.value
             elif self.parameter.type == 'file':
+                parameter_path = os.path.join(dir, self.parameter.name)
                 shutil.copy(self.value.name, parameter_path)
+                return parameter_path
         raise AssertionError("Unsupported parameter")
 
 
@@ -98,28 +99,43 @@ class Run(models.Model):
                 raw_compose_file_path = os.path.join(template_compile_path, COMPOSE_FILE_NAME)
                 with open(raw_compose_file_path, "w") as file:
                     file.write(self.operation.config)
+                for resource in self.operation.resources.all():
+                    shutil.copyfile(
+                        resource.file.name,
+                        os.path.join(template_compile_path, resource.name)
+                    )
 
                 # Section 2: Compile a dictionary with all parameters
                 context = {}
                 output_parameters = []
                 for parameter in self.operation.parameters.all():
-                    parameter_path = os.path.join(shared_path, self.parameter.name)
                     if parameter.is_input:
                         try:
                             value = self.parameter_value_set.get(parameter=parameter)
-                            value.compile_for_input(parameter_path)
+                            template_value = value.compile_for_input(shared_path)
                         except ParameterValue.DoesNotExist:
                             if parameter.is_required:
                                 raise AssertionError("Input parameter {} is required but is not given".format(parameter.name))
                             else:
-                                parameter_path = "/dev/null"
+                                template_value = parameter.get_non_existant_value()
                     else:
                         try:
                             self.parameter_value_set.get(parameter=parameter).delete()
                         except ParameterValue.DoesNotExist:
                             pass
                         output_parameters.append(parameter)
-                    context[parameter.name] = parameter_path
+                        template_value = os.path.join(shared_path, self.parameter.name)
+                    context[parameter.name] = template_value
+
+                # TODO: Resources are used for different purposes. Separate them.
+
+                for resource in self.operation.resources.all():
+                    resource_path = os.path.join(shared_path, resource.name)
+                    shutil.copyfile(
+                        resource.file.name,
+                        resource_path
+                    )
+                    context[resource.name] = resource_path
 
                 # Section 3: Compile config file
                 template_engine = Engine(
@@ -133,13 +149,10 @@ class Run(models.Model):
                 with open(compiled_compose_file_path, "w") as file:
                     file.write(rendered_compose_file)
 
-            for resource in self.operation.resources.all():
-                shutil.copyfile(
-                    resource.file.name,
-                    os.path.join(shared_path, resource.name)
-                )
-
             # Section 4: Provide config file to the manager node and run it
+
+            # TODO: Use docker-compose interface to calculate sum of limits
+
             memlim_sum = 0.0
             cpulim_sum = 0.0
             with open(compiled_compose_file_path) as file:
@@ -182,10 +195,11 @@ class Run(models.Model):
                         condition='none'
                     ),
                     mounts=[
-                        "{}:/compose:rw".format(shared_path)
+                        "{}:/compose:ro".format(shared_path)
                     ]
                 )
 
+                # TODO: Use docker interface to wait for the manager
                 while len(manager.tasks(filter={'desired-state': 'shutdown'})) == 0:
                     time.sleep(STATUS_CHECK_PERIOD)
 
