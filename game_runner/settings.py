@@ -24,7 +24,7 @@ SECRET_KEY = 'hpzh6r7e@2u8_!+w$(mx-2&0*p(xk=7!+2)+16a_a^r5@&=wiu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -134,4 +134,9 @@ AUTH_USER_MODEL = 'auth.User'
 
 # The path to nfs-folder synced across all instances. Appended to MEDIA_ROOT
 NFS_DIR = 'nfs/'
-DOCKER_REGISTRY_URL = '84.200.16.245:5000'
+DOCKER_REGISTRY_URL = 'localhost:5000'
+
+try:
+    from . import local_settings
+except:
+    pass
