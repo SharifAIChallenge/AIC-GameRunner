@@ -11,6 +11,12 @@ import os
 import shutil
 import yaml
 
+import docker
+from docker.types import Resources as DockerResources
+from docker.types import RestartPolicy as DockerRestartPolicy
+
+import time
+
 
 class ParameterValue(models.Model):
     _value = models.TextField()
@@ -78,6 +84,9 @@ class Run(models.Model):
         self.save()
 
         COMPOSE_FILE_NAME = "docker-compose.yml"
+        MANAGER_CPU_LIMIT = None
+        MANAGER_MEMORY_LIMIT = None
+        STATUS_CHECK_PERIOD = 10
 
         with tempfile.TemporaryDirectory(prefix=settings.NFS_DIR) as shared_path:
 
@@ -89,11 +98,6 @@ class Run(models.Model):
                 raw_compose_file_path = os.path.join(template_compile_path, COMPOSE_FILE_NAME)
                 with open(raw_compose_file_path, "w") as file:
                     file.write(self.operation.config)
-                for resource in self.operation.resources.all():
-                    shutil.copyfile(
-                        resource.file.name,
-                        os.path.join(template_compile_path, resource.name)
-                    )
 
                 # Section 2: Compile a dictionary with all parameters
                 context = {}
@@ -129,6 +133,12 @@ class Run(models.Model):
                 with open(compiled_compose_file_path, "w") as file:
                     file.write(rendered_compose_file)
 
+            for resource in self.operation.resources.all():
+                shutil.copyfile(
+                    resource.file.name,
+                    os.path.join(shared_path, resource.name)
+                )
+
             # Section 4: Provide config file to the manager node and run it
             memlim_sum = 0.0
             cpulim_sum = 0.0
@@ -139,18 +149,45 @@ class Run(models.Model):
                     cpulim_sum += float(x['cpus'])
                     s = x['memory']
                     if __name__ == '__main__':
-                        if s[-1] == 'K':
+                        if s[-1].upper() == 'B':
                             memlim_sum += int(s[:-1])
-                        elif s[-1] == 'M':
-                            memlim_sum += int(s[-1]) * 1024
-                        elif s[-1] == 'G':
+                        if s[-1].upper() == 'K':
+                            memlim_sum += int(s[:-1]) * 1024
+                        elif s[-1].upper() == 'M':
                             memlim_sum += int(s[-1]) * 1024 * 1024
+                        elif s[-1].upper() == 'G':
+                            memlim_sum += int(s[-1]) * 1024 * 1024 * 1024
                         else:
                             raise TypeError
 
-                # docker service create ...
+                client = docker.from_env()
+                manager = client.services.create(
+                    image='kondor-manager',
+                    resources=DockerResources(
+                        cpu_limit=(MANAGER_CPU_LIMIT * (10 ** 9))
+                        if MANAGER_CPU_LIMIT is not None else None,
+                        mem_limit=MANAGER_MEMORY_LIMIT,
+                        cpu_reservation=(
+                                            (MANAGER_CPU_LIMIT
+                                             if MANAGER_CPU_LIMIT is not None else 0) +
+                                            cpulim_sum
+                                        ) * (10 ** 9),
+                        mem_reservation=(
+                            (MANAGER_MEMORY_LIMIT
+                             if MANAGER_MEMORY_LIMIT is not None else 0) +
+                            memlim_sum
+                        ),
+                    ),
+                    restart_policy=DockerRestartPolicy(
+                        condition='none'
+                    ),
+                    mounts=[
+                        "{}:/compose:rw".format(shared_path)
+                    ]
+                )
 
-                #while [ 1 -ne `docker service ps $name | tail -n +2 | awk '{print $5}' | grep Shutdown | wc -l` ] ; do sleep 0.5; done
+                while len(manager.tasks(filter={'desired-state': 'shutdown'})) == 0:
+                    time.sleep(STATUS_CHECK_PERIOD)
 
         # Section 5: Save outputs. Set run status to success
         for parameter in output_parameters:
