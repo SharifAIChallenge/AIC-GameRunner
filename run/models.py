@@ -17,6 +17,8 @@ from docker.types import RestartPolicy as DockerRestartPolicy
 
 import time
 
+from compose.config.config import ConfigFile
+
 
 class ParameterValue(models.Model):
     _value = models.TextField()
@@ -155,23 +157,25 @@ class Run(models.Model):
 
             memlim_sum = 0.0
             cpulim_sum = 0.0
-            with open(compiled_compose_file_path) as file:
-                compose = yaml.load(file)
-                for name in compose['services'] :
-                    x = compose['services'][name]['deploy']['resources']['limits']
-                    cpulim_sum += float(x['cpus'])
-                    s = x['memory']
-                    if __name__ == '__main__':
-                        if s[-1].upper() == 'B':
-                            memlim_sum += int(s[:-1])
-                        if s[-1].upper() == 'K':
-                            memlim_sum += int(s[:-1]) * 1024
-                        elif s[-1].upper() == 'M':
-                            memlim_sum += int(s[-1]) * 1024 * 1024
-                        elif s[-1].upper() == 'G':
-                            memlim_sum += int(s[-1]) * 1024 * 1024 * 1024
-                        else:
-                            raise TypeError
+            compose = ConfigFile.from_filename(compiled_compose_file_path)
+            for service_name in compose.get_service_dicts():
+                service = compose.get_service(service_name)
+                try:
+                    limits = service['deploy']['resources']['limits']
+                except KeyError:
+                    continue
+                cpulim_sum += float(limits.get('cpus', 0))
+                service_memory_constraint = limits.get('memory', "0B")
+                if service_memory_constraint[-1].upper() == 'B':
+                    memlim_sum += int(service_memory_constraint[:-1])
+                if service_memory_constraint[-1].upper() == 'K':
+                    memlim_sum += int(service_memory_constraint[:-1]) * 1024
+                elif service_memory_constraint[-1].upper() == 'M':
+                    memlim_sum += int(service_memory_constraint[-1]) * 1024 * 1024
+                elif service_memory_constraint[-1].upper() == 'G':
+                    memlim_sum += int(service_memory_constraint[-1]) * 1024 * 1024 * 1024
+                else:
+                    raise TypeError
 
                 client = docker.from_env()
                 manager = client.services.create(
