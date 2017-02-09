@@ -8,6 +8,8 @@ from docker.errors import BuildError
 
 from game_runner import settings
 
+import tarfile
+
 
 class DockerFile(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
@@ -18,6 +20,7 @@ class DockerFile(models.Model):
     cpushare = models.IntegerField(help_text='CPU shares (relative weight)', blank=True, null=True)
     latest_image_version = models.IntegerField(editable=False, default=0)
     latest_build_and_push_log = models.TextField(editable=False, blank=True, null=False, default='')
+    tar_file = models.BooleanField(verbose_name='is tar file?', default=False)
 
     def save(self, *args, **kwargs):
         if getattr(self, 'version', None) is None:
@@ -32,7 +35,10 @@ class DockerFile(models.Model):
                 resource_dir = os.path.dirname(os.path.abspath(resource.name))
                 os.makedirs(os.path.join(tmpfolder, resource_dir), exist_ok=True)
                 shutil.copy(resource.file.path, os.path.join(tmpfolder, resource.name))
-            shutil.copyfile(self.file.path, os.path.join(tmpfolder, 'Dockerfile'))
+            if self.tar_file:
+                tarfile.open(self.file.path).extractall(tmpfolder)
+            else:
+                shutil.copyfile(self.file.path, os.path.join(tmpfolder, 'Dockerfile'))
             client = docker.DockerClient(base_url=settings.DOCKER_HOST)
             images = client.images
             image_repository_name = settings.DOCKER_REGISTRY_URL + '/' + self.name
