@@ -5,6 +5,7 @@ from docker_registry.models import DockerFile, Resource
 
 class DockerFileAdmin(admin.ModelAdmin):
     actions = ['build_and_push']
+    readonly_fields = ['latest_build_and_push_log']
 
     def build_and_push(self, request, queryset):
         for dockerfile in queryset:

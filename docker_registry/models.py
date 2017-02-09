@@ -2,7 +2,9 @@ import shutil
 import tempfile
 
 import docker
+import os
 from django.db import models
+from docker.errors import BuildError
 
 from game_runner import settings
 
@@ -15,36 +17,50 @@ class DockerFile(models.Model):
                                       null=True)  # TODO: Check KBs
     cpushare = models.IntegerField(help_text='CPU shares (relative weight)', blank=True, null=True)
     latest_image_version = models.IntegerField(editable=False, default=0)
+    latest_build_and_push_log = models.TextField(editable=False, blank=True, null=False, default='')
 
-    def save(self):
-        if getattr(self, 'version') is None:
+    def save(self, *args, **kwargs):
+        if getattr(self, 'version', None) is None:
             self.version = 0
         self.version += 1
-        super(DockerFile, self).save()
-        # self.build_and_push()
+        super(DockerFile, self).save(*args, **kwargs)
 
-    # TODO: update latest_image_version if push was successful
     def build_and_push(self):
-        tmpfolder = tempfile.TemporaryDirectory()
-        shutil.copyfile(settings.MEDIA_ROOT + self.file.name, tmpfolder.name + '/Dockerfile')
-        for resource in list(self.resource_set.all()):
-            shutil.copy(settings.MEDIA_ROOT + resource.file.name, tmpfolder.name)
-        client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-        images = client.images
-        images.build(path=tmpfolder.name,
-                     tag=settings.DOCKER_REGISTRY_URL + '/' + self.name + ':' + self.version.__str__(),
-                     container_limits=self.get_limits())
-        images.build(path=tmpfolder.name, tag=settings.DOCKER_REGISTRY_URL + '/' + self.name,
-                     container_limits=self.get_limits())
-        images.push(settings.DOCKER_REGISTRY_URL + '/' + self.name, tag=self.version.__str__(), insecure_registry=True)
-        images = images.push(settings.DOCKER_REGISTRY_URL + '/' + self.name, tag='latest', insecure_registry=True)
-        pass
+        with tempfile.TemporaryDirectory() as tmpfolder:
+            for resource in self.resource_set.all():
+                # TODO : Make sure the following line is not a security risk.
+                resource_dir = os.path.dirname(os.path.abspath(resource.name))
+                os.makedirs(os.path.join(tmpfolder, resource_dir), exist_ok=True)
+                shutil.copy(resource.file.path, os.path.join(tmpfolder, resource.name))
+            shutil.copyfile(self.file.path, os.path.join(tmpfolder, 'Dockerfile'))
+            client = docker.DockerClient(base_url=settings.DOCKER_HOST)
+            images = client.images
+            image_repository_name = settings.DOCKER_REGISTRY_URL + '/' + self.name
+            image_tag = str(self.version)
+            self.latest_build_and_push_log = ''
+            try:
+                current_image = images.build(path=tmpfolder,
+                                             tag=image_repository_name,
+                                             container_limits=self._get_limits())
+                self.latest_build_and_push_log = 'Image successfully built.'
+            except BuildError as e:
+                self.latest_build_and_push_log = 'Build failed. \n' + str(e)
+                current_image = None
+            if current_image is not None:
+                current_image.tag(repository=image_repository_name, tag=image_tag)
+                versioned_push_log = images.push(image_repository_name, tag=image_tag)
+                self.latest_build_and_push_log += '\n' + versioned_push_log
+                latest_push_log = images.push(image_repository_name, tag='latest')
+                self.latest_build_and_push_log += '\n' + latest_push_log
+                # TODO: update latest_image_version if push was successful
+
+            self.save()
 
     def __str__(self):
         return 'Dockerfile= ' + self.name + ':' + self.version.__str__() + \
                ' / Latest image version= ' + self.latest_image_version.__str__()
 
-    def get_limits(self):
+    def _get_limits(self):
         limits = {}
         if self.memorylimit is not None:
             limits['memory'] = self.memorylimit

@@ -132,11 +132,12 @@ MEDIA_ROOT = 'files/'
 # Project User Model
 AUTH_USER_MODEL = 'auth.User'
 
-# The path to nfs-folder synced across all instances. Appended to MEDIA_ROOT
-NFS_DIR = 'nfs/'
+# The absolute path to nfs-folder synced across all instances.
+NFS_DIR = '/nfs/'
 DOCKER_REGISTRY_URL = 'localhost:5000'
+DOCKER_HOST = None  # Set to None to use docker's default.
 
 try:
-    from . import local_settings
+    from .local_settings import *
 except:
     pass
