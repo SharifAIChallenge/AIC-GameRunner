@@ -39,7 +39,7 @@ class TokenIPAuth(BaseAuthentication):
         if token.ip_restricted and token.ip_set.filter(ip=ip).count() == 0:
             msg = _('token does not match this ip')
             raise exceptions.AuthenticationFailed(msg)
-        return None, Token
+        return None, token
 
     def authenticate_header(self, request):
         return self.keyword
