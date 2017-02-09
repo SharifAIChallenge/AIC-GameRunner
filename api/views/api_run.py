@@ -27,7 +27,7 @@ class RunCreateView(APIView):
             else:
                 result.append({
                     'success': False,
-                    'errors': serializer.error_messages
+                    'errors': serializer.errors
                 })
         return Response(result, status=status.HTTP_200_OK)
 
