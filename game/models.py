@@ -27,7 +27,7 @@ class Operation(models.Model):
 class OperationResource(models.Model):
     operation = models.ForeignKey(Operation, verbose_name=_("operation"), related_name="resources")
     name = models.CharField(max_length=100, verbose_name=_("name"))
-    file = models.FileField(verbose_name=_("file"), upload_to=settings.NFS_DIR)
+    file = models.FileField(verbose_name=_("file"))
 
     class Meta:
         unique_together = (("operation", "name"), )
@@ -44,7 +44,7 @@ class OperationParameter(models.Model):
     type = models.CharField(choices=PARAMETER_TYPES, verbose_name=_("type"), max_length=20)
     required = models.BooleanField(verbose_name=_("required"), default=True)
     is_input = models.BooleanField(verbose_name=_("is input?"))
-    max_size = models.IntegerField(verbose_name=_("max size in bytes"))
+    max_size = models.IntegerField(verbose_name=_("max size in bytes"), default=0, help_text="Use 0 for unlimited")
 
     class Meta:
         unique_together = (("operation", "name"), )

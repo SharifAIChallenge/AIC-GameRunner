@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import JSONParser
 
 from game.models import Operation, OperationParameter
@@ -67,6 +68,13 @@ class RunCreateSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         raise NotImplementedError()
+
+    def validate(self, attrs):
+        given_names = [a.name for a, b in attrs['parameters']]
+        for parameter in attrs['operation'].parameters.filter(is_input=True, required=True):
+            if parameter.name not in given_names:
+                raise ValidationError("Parameter {} is required".format(parameter.name), code='required')
+        return attrs
 
     def create(self, validated_data):
         run = Run(operation=validated_data['operation'])
