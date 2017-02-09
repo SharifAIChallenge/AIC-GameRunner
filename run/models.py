@@ -183,25 +183,24 @@ class Run(models.Model):
                     memlim_sum += int(service_memory_constraint[-1]) * 1024 * 1024 * 1024
                 else:
                     raise TypeError
-            logger.debug("Total memory limit:{}, Total cpus:{}".format(memlim_sum, cpulim_sum))
+
+            cpu_tot_reserve = (MANAGER_CPU_LIMIT
+                               if MANAGER_CPU_LIMIT is not None else 0) + cpulim_sum
+            mem_tot_reserve = (MANAGER_MEMORY_LIMIT
+                               if MANAGER_MEMORY_LIMIT is not None else 0) + memlim_sum
+
+            logger.debug("Total memory limit:{}, Total cpus:{}".format(mem_tot_reserve, cpu_tot_reserve))
             logger.info("Starting execution")
             client = docker.from_env()
+
             manager = client.services.create(
                 image='kondor-manager',
                 resources=DockerResources(
                     cpu_limit=(MANAGER_CPU_LIMIT * (10 ** 9))
                     if MANAGER_CPU_LIMIT is not None else None,
                     mem_limit=MANAGER_MEMORY_LIMIT,
-                    cpu_reservation=(
-                                        (MANAGER_CPU_LIMIT
-                                         if MANAGER_CPU_LIMIT is not None else 0) +
-                                        cpulim_sum
-                                    ) * (10 ** 9),
-                    mem_reservation=(
-                        (MANAGER_MEMORY_LIMIT
-                         if MANAGER_MEMORY_LIMIT is not None else 0) +
-                        memlim_sum
-                    ),
+                    cpu_reservation=(cpu_tot_reserve * (10 ** 9)) if cpu_tot_reserve > 0 else None,
+                    mem_reservation=mem_tot_reserve if mem_tot_reserve > 0 else None,
                 ),
                 restart_policy=DockerRestartPolicy(
                     condition='none'
