@@ -12,9 +12,10 @@ class FileUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser,)
 
     def post(self, request):
-        data = request.data
-        data['owner_id'] = request.user.id
-        serializer = FileSerializer(data=data)
+        serializer_data = dict()
+        serializer_data['owner'] = request.auth
+        serializer_data['file'] = request.data['file']
+        serializer = FileSerializer(data=serializer_data)
 
         if serializer.is_valid():
             serializer.save()
@@ -27,7 +28,7 @@ class FileDownloadView(APIView):
     def post(self, request):
         if 'token' in request.data:
             try:
-                file = File.objects.get(id=request.data['token'])
+                file = File.objects.get(id=request.data['token'], owner=request.auth)
                 file_name = os.path.basename(file.file.name)
                 response = HttpResponse(file.file, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename="%s"' % file_name
