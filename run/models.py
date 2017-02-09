@@ -19,6 +19,10 @@ import time
 
 from compose.config.config import ConfigFile
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class ParameterValue(models.Model):
     _value = models.TextField()
@@ -55,7 +59,7 @@ class ParameterValue(models.Model):
                 return self.value
             elif self.parameter.type == 'file':
                 parameter_path = os.path.join(dir, self.parameter.name)
-                shutil.copy(self.value.name, parameter_path)
+                shutil.copy(self.value.file.path, parameter_path)
                 return parameter_path
         raise AssertionError("Unsupported parameter")
 
@@ -83,6 +87,7 @@ class Run(models.Model):
 
     def compile_compose_file(self):
         # Section 0: Set run status to running
+        logger.info("Starting execution of run {}".format(str(self)))
         self.status = self.RUNNING
         self.save()
 
@@ -127,6 +132,7 @@ class Run(models.Model):
                             pass
                         output_parameters.append(parameter)
                         template_value = os.path.join(shared_path, parameter.name)
+                        open(template_value, 'a').close()  # Touch the file, making sure it exists
                     context[parameter.name] = template_value
 
                 # TODO: Resources are used for different purposes. Separate them.
@@ -150,6 +156,7 @@ class Run(models.Model):
                 compiled_compose_file_path = os.path.join(shared_path, COMPOSE_FILE_NAME)
                 with open(compiled_compose_file_path, "w") as file:
                     file.write(rendered_compose_file)
+
 
             # Section 4: Provide config file to the manager node and run it
 
@@ -176,43 +183,57 @@ class Run(models.Model):
                     memlim_sum += int(service_memory_constraint[-1]) * 1024 * 1024 * 1024
                 else:
                     raise TypeError
-
-                client = docker.from_env()
-                manager = client.services.create(
-                    image='kondor-manager',
-                    resources=DockerResources(
-                        cpu_limit=(MANAGER_CPU_LIMIT * (10 ** 9))
-                        if MANAGER_CPU_LIMIT is not None else None,
-                        mem_limit=MANAGER_MEMORY_LIMIT,
-                        cpu_reservation=(
-                                            (MANAGER_CPU_LIMIT
-                                             if MANAGER_CPU_LIMIT is not None else 0) +
-                                            cpulim_sum
-                                        ) * (10 ** 9),
-                        mem_reservation=(
-                            (MANAGER_MEMORY_LIMIT
-                             if MANAGER_MEMORY_LIMIT is not None else 0) +
-                            memlim_sum
-                        ),
+            logger.debug("Total memory limit:{}, Total cpus:{}".format(memlim_sum, cpulim_sum))
+            logger.info("Starting execution")
+            client = docker.from_env()
+            manager = client.services.create(
+                image='kondor-manager',
+                resources=DockerResources(
+                    cpu_limit=(MANAGER_CPU_LIMIT * (10 ** 9))
+                    if MANAGER_CPU_LIMIT is not None else None,
+                    mem_limit=MANAGER_MEMORY_LIMIT,
+                    cpu_reservation=(
+                                        (MANAGER_CPU_LIMIT
+                                         if MANAGER_CPU_LIMIT is not None else 0) +
+                                        cpulim_sum
+                                    ) * (10 ** 9),
+                    mem_reservation=(
+                        (MANAGER_MEMORY_LIMIT
+                         if MANAGER_MEMORY_LIMIT is not None else 0) +
+                        memlim_sum
                     ),
-                    restart_policy=DockerRestartPolicy(
-                        condition='none'
-                    ),
-                    mounts=[
-                        "{}:/compose:ro".format(shared_path)
-                    ]
-                )
+                ),
+                restart_policy=DockerRestartPolicy(
+                    condition='none'
+                ),
+                mounts=[
+                    "{}:/compose:ro".format(shared_path)
+                ]
+            )
 
-                # TODO: Use docker interface to wait for the manager
-                while len(manager.tasks(filter={'desired-state': 'shutdown'})) == 0:
-                    time.sleep(STATUS_CHECK_PERIOD)
+            # TODO: Use docker interface to wait for the manager
+            # TODO: Time limit
+            while len(manager.tasks(filter={'desired-state': 'shutdown'})) == 0:
+                logging.info("Checking if job is done")
+                time.sleep(STATUS_CHECK_PERIOD)
 
-        # Section 5: Save outputs. Set run status to success
-        for parameter in output_parameters:
-            with open(context[parameter.name]) as file:
-                file_ = File.objects.create(file=DjangoFile(file))
-                parameter_value = ParameterValue(run=self, parameter=parameter)
-                parameter_value.value = file_
-                parameter_value.save()
-        self.status = self.SUCCESS
+            logging.info("Execution finished")
+            # Section 5: Save outputs. Set run status to success
+
+            logging.info("Extracting outputs and saving results")
+            self.log = ""
+            failed = False
+            for parameter in output_parameters:
+                if not os.path.isfile(context[parameter.name]):
+                    self.log += "ERROR: Parameter {} not found."
+                    failed = True
+                else:
+                    with open(context[parameter.name]) as file:
+                        file_ = File.objects.create(file=DjangoFile(file))
+                        parameter_value = ParameterValue(run=self, parameter=parameter)
+                        parameter_value.value = file_
+                        parameter_value.save()
+
+        self.status = self.FAILURE if failed else self.SUCCESS
         self.save()
+        logging.info("Done. status: {}".format("failed" if failed else "success"))
