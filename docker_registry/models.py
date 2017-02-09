@@ -27,9 +27,12 @@ class DockerFile(models.Model):
 
     def build_and_push(self):
         with tempfile.TemporaryDirectory() as tmpfolder:
-            shutil.copyfile(self.file.path, os.path.join(tmpfolder, 'Dockerfile'))
             for resource in self.resource_set.all():
-                shutil.copy(resource.file.path, tmpfolder)
+                # TODO : Make sure the following line is not a security risk.
+                resource_dir = os.path.dirname(os.path.abspath(resource.name))
+                os.makedirs(os.path.join(tmpfolder, resource_dir), exist_ok=True)
+                shutil.copy(resource.file.path, os.path.join(tmpfolder, resource.name))
+            shutil.copyfile(self.file.path, os.path.join(tmpfolder, 'Dockerfile'))
             client = docker.DockerClient(base_url=settings.DOCKER_HOST)
             images = client.images
             image_repository_name = settings.DOCKER_REGISTRY_URL + '/' + self.name
