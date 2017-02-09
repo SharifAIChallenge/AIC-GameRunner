@@ -124,7 +124,7 @@ class Run(models.Model):
                         except ParameterValue.DoesNotExist:
                             pass
                         output_parameters.append(parameter)
-                        template_value = os.path.join(shared_path, self.parameter.name)
+                        template_value = os.path.join(shared_path, parameter.name)
                     context[parameter.name] = template_value
 
                 # TODO: Resources are used for different purposes. Separate them.

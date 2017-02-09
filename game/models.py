@@ -27,7 +27,7 @@ class Operation(models.Model):
 class OperationResource(models.Model):
     operation = models.ForeignKey(Operation, verbose_name=_("operation"), related_name="resources")
     name = models.CharField(max_length=100, verbose_name=_("name"))
-    file = models.FileField(verbose_name=_("file"), upload_to=settings.NFS_DIR)
+    file = models.FileField(verbose_name=_("file"))
 
     class Meta:
         unique_together = (("operation", "name"), )
