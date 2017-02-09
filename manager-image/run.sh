@@ -9,7 +9,7 @@ python ../sc.py $nodeid > docker-compose-final.yml
 echo Number of services: $nos
 
 docker stack deploy -c docker-compose-final.yml $name
-while [ $nos -ne `docker stack ps $name | tail -n +2 | awk '{print $5}' | grep Running | wc -l` ] ; 
+while [ $nos -ne `docker stack ps $name | tail -n +2 | awk '{print $5}' | wc -l` ] ;
 do
     sleep 0.5
 done
