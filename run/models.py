@@ -15,6 +15,8 @@ import yaml
 import docker
 from docker.types import Resources as DockerResources
 from docker.types import RestartPolicy as DockerRestartPolicy
+from docker.types import Mount as DockerMount
+
 
 import time
 
@@ -210,8 +212,19 @@ class Run(models.Model):
                     condition='none'
                 ),
                 mounts=[
+                    DockerMount(
+                        source=shared_path,
+                        target="/compose",
+                        type='bind',
+                    ),
                     "{}:/compose:ro".format(shared_path),
-                    "/var/run/docker.sock:/var/run/docker.sock:ro",
+                    DockerMount(
+                        # TODO: Can we use a more general term here e.g. settings.DOCKER_HOST?
+                        source='/var/run/docker.sock',
+                        target='/var/run/docker.sock',
+                        type='bind',
+                        read_only=True
+                    ),
                 ],
                 name="{}".format(manager_uid),
             )
