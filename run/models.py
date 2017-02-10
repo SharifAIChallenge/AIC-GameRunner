@@ -2,6 +2,7 @@ from django.db import models
 from django.template import Engine, Context
 from django.core.files import File as DjangoFile
 
+from game_runner.utils import get_docker_client
 from storage.models import File
 from game_runner import settings
 from game.models import OperationParameter, Game, Operation
@@ -191,8 +192,8 @@ class Run(models.Model):
 
             logger.debug("Total memory limit:{}, Total cpus:{}".format(mem_tot_reserve, cpu_tot_reserve))
             logger.info("Starting execution")
-            client = docker.from_env()
-
+            client = get_docker_client()
+            manager_uid = str(self.pk)
             manager = client.services.create(
                 image='kondor-manager',
                 resources=DockerResources(
@@ -202,36 +203,78 @@ class Run(models.Model):
                     cpu_reservation=(cpu_tot_reserve * (10 ** 9)) if cpu_tot_reserve > 0 else None,
                     mem_reservation=mem_tot_reserve if mem_tot_reserve > 0 else None,
                 ),
+                env=[
+                    "MANAGER_UID={}".format(manager_uid),
+                ],
                 restart_policy=DockerRestartPolicy(
                     condition='none'
                 ),
                 mounts=[
-                    "{}:/compose:ro".format(shared_path)
-                ]
+                    "{}:/compose:ro".format(shared_path),
+                    "/var/run/docker.sock:/var/run/docker.sock:ro",
+                ],
+                name="{}".format(manager_uid),
             )
 
             # TODO: Use docker interface to wait for the manager
             # TODO: Time limit
+
+            self.log = ""
+            failed = False
+
+            logging.info("Waiting for the tasks to be started")
+            while len(manager.tasks(filters={'desired-state': 'running'})) == 0 and \
+                    len(manager.tasks(filters={'desired-state': 'shutdown'})) == 0:
+                logging.info("Checking if job has started")
+                time.sleep(STATUS_CHECK_PERIOD)
+
+            logging.info("Waiting for the tasks to be finished")
+            start_time = time.time()
             while len(manager.tasks(filters={'desired-state': 'shutdown'})) == 0:
                 logging.info("Checking if job is done")
+                current_time = time.time()
+                if current_time - start_time > self.operation.time_limit:
+                    failed = True
+                    self.log += "ERROR: Killing manager due to timeout after {} seconds\n".format(
+                        current_time - start_time
+                    )
+                    break
                 time.sleep(STATUS_CHECK_PERIOD)
+
+            logging.info("Cleaning up")
+            manager.remove()
+
+            # TODO: Cleaning spawned services in here should just be a fail-safe.
+            # Manager should be reponsible for cleaning up when being killed.
+
+            # FIXME: Stacks aren't currently supported in Docker API
+            # The following line assumes services for a stack are named
+            # in a specific manner. This must be changed to be implemented
+            # using the API.
+
+            services = client.services.list(filters={"name": "{}_".format(manager_uid)})
+            for service in services:
+                service.remove()
 
             logging.info("Execution finished")
             # Section 5: Save outputs. Set run status to success
 
-            logging.info("Extracting outputs and saving results")
-            self.log = ""
-            failed = False
             for parameter in output_parameters:
                 if not os.path.isfile(context[parameter.name]):
-                    self.log += "ERROR: Parameter {} not found."
+                    self.log += "ERROR: Parameter {} not found.\n"
                     failed = True
-                else:
-                    with open(context[parameter.name]) as file:
-                        file_ = File.objects.create(file=DjangoFile(file))
-                        parameter_value = ParameterValue(run=self, parameter=parameter)
-                        parameter_value.value = file_
-                        parameter_value.save()
+            if not failed:
+                logging.info("Extracting outputs and saving results")
+                for parameter in output_parameters:
+                    if not os.path.isfile(context[parameter.name]):
+                        self.log += "ERROR: Parameter {} not found.\n"
+                        failed = True
+                    else:
+                        with open(context[parameter.name]) as file:
+                            file_ = File.objects.create(file=DjangoFile(file))
+                            parameter_value = ParameterValue(run=self, parameter=parameter)
+                            parameter_value.value = file_
+                            parameter_value.save()
 
         self.status = self.FAILURE if failed else self.SUCCESS
         self.save()

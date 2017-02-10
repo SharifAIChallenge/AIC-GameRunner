@@ -16,6 +16,14 @@ class Operation(models.Model):
     game = models.ForeignKey(to=Game, verbose_name=_('game'), null=False, blank=False)
     name = models.CharField(verbose_name=_('name'), max_length=100)
     config = models.TextField(verbose_name=_("docker compose yml template"), null=False)
+    time_limit = models.IntegerField(verbose_name=_("Time limit"),
+                                     help_text=_("in seconds. "
+                                                 "WARNING: this time limit is not strict. "
+                                                 "i.e. it's possible that the system allows an operation to "
+                                                 "continue running for slightly less or more time than "
+                                                 "specified here."),
+                                     default=120,
+                                     )
 
     class Meta:
         unique_together = (("game", "name"), )

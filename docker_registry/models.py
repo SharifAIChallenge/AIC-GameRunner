@@ -10,6 +10,8 @@ from game_runner import settings
 
 import tarfile
 
+from game_runner.utils import get_docker_client
+
 
 class DockerFile(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
@@ -39,7 +41,7 @@ class DockerFile(models.Model):
                 tarfile.open(self.file.path).extractall(tmpfolder)
             else:
                 shutil.copyfile(self.file.path, os.path.join(tmpfolder, 'Dockerfile'))
-            client = docker.DockerClient(base_url=settings.DOCKER_HOST)
+            client = get_docker_client()
             images = client.images
             image_repository_name = settings.DOCKER_REGISTRY_URL + '/' + self.name
             image_tag = str(self.version)
