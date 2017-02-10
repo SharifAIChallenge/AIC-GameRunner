@@ -217,7 +217,6 @@ class Run(models.Model):
                         target="/compose",
                         type='bind',
                     ),
-                    "{}:/compose:ro".format(shared_path),
                     DockerMount(
                         # TODO: Can we use a more general term here e.g. settings.DOCKER_HOST?
                         source='/var/run/docker.sock',
