@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from api.serializers import RunCreateSerializer, RunReportSerializer
 from run.models import Run
+import datetime
 
 
 class RunCreateView(APIView):
@@ -33,11 +34,14 @@ class RunCreateView(APIView):
 
 
 class RunReportView(APIView):
-    def post(self, request):
-        data = JSONParser().parse(request)
+    def get(self, request):
+        data = request.GET
         # todo put the last time report view is called as default for 'time' param.
         if 'time' in data:
-            from_time = data['time']
+            try:
+                from_time = datetime.datetime.fromtimestamp(float(data['time']))
+            except ValueError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         runs = Run.objects.all().filter(end_time__gte=from_time)
