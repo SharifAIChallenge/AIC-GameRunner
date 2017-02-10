@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.template import Engine, Context
 from django.core.files import File as DjangoFile
@@ -91,6 +93,7 @@ class Run(models.Model):
     def compile_compose_file(self):
         # Section 0: Set run status to running
         logger.info("Starting execution of run {}".format(str(self)))
+        self.start_time = datetime.now()
         self.status = self.RUNNING
         self.save()
 
@@ -291,5 +294,6 @@ class Run(models.Model):
                             parameter_value.save()
 
         self.status = self.FAILURE if failed else self.SUCCESS
+        self.end_time = datetime.now()
         self.save()
         logging.info("Done. status: {}".format("failed" if failed else "success"))
