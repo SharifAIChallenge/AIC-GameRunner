@@ -212,7 +212,7 @@ class Run(models.Model):
 
             # TODO: Use docker interface to wait for the manager
             # TODO: Time limit
-            while len(manager.tasks(filter={'desired-state': 'shutdown'})) == 0:
+            while len(manager.tasks(filters={'desired-state': 'shutdown'})) == 0:
                 logging.info("Checking if job is done")
                 time.sleep(STATUS_CHECK_PERIOD)
 
