@@ -283,7 +283,9 @@ class Run(models.Model):
                         failed = True
                     else:
                         with open(context[parameter.name]) as file:
-                            file_ = File.objects.create(file=DjangoFile(file))
+                            file_ = File()
+                            file_.file.save(parameter.name, DjangoFile(file))
+                            file_.save()
                             parameter_value = ParameterValue(run=self, parameter=parameter)
                             parameter_value.value = file_
                             parameter_value.save()
