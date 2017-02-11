@@ -1,0 +1,8 @@
+To start a registry:
+
+1- Run create_registry_certificate.sh <ip>
+2- Run secure_docker_start_registry.sh
+3- Copy certs/ca.crt to clients as described in step 4 here:
+https://docs.docker.com/registry/insecure/#using-self-signed-certificates
+
+
