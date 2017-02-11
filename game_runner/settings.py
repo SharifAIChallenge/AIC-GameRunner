@@ -137,6 +137,13 @@ NFS_DIR = '/nfs/'
 DOCKER_REGISTRY_URL = 'localhost:5000'
 DOCKER_HOST = None  # Set to None to use docker's default.
 
+CELERY_BEAT_SCHEDULE = {
+    'periodic_check_for_missed_runs': {
+        'task': 'run.tasks.periodic_check_for_missed_runs',
+        'schedule': 10.0,
+    }
+}
+
 try:
     from .local_settings import *
 except:

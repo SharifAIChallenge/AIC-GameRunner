@@ -75,6 +75,7 @@ class Run(models.Model):
     request_time = models.DateTimeField(auto_now_add=True, null=True)
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
+    queue_reference_id = models.CharField(null=True, max_length=200)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
     log = models.TextField()
     # choices for the status
@@ -95,6 +96,7 @@ class Run(models.Model):
         logger.info("Starting execution of run {}".format(str(self)))
         self.start_time = datetime.now()
         self.status = self.RUNNING
+        self.queue_reference_id = None  # Releasing queue id
         self.save()
 
         COMPOSE_FILE_NAME = "docker-compose.yml"
@@ -297,3 +299,7 @@ class Run(models.Model):
         self.end_time = datetime.now()
         self.save()
         logging.info("Done. status: {}".format("failed" if failed else "success"))
+
+
+
+
