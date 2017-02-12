@@ -27,7 +27,6 @@ then
             sudo docker run\
             -d\
             -p 5000:5000\
-            -p 5001:5001\
             -v `pwd`/certs:/certs\
             -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry.crt\
             -e REGISTRY_HTTP_TLS_KEY=/certs/registry.key\
