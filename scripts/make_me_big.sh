@@ -20,8 +20,8 @@ cp "$4" "/etc/docker/certs.d/$3:5000/ca.crt"
 echo "Added certificate. "
 
 echo "Configuring NFS..."
-#./nfs_client_v2.sh $1 $2 $3
-#./nfs_client_automount.sh $1 $2 $3
+./nfs_client_v2.sh $1 $2 $3
+./nfs_client_automount.sh $1 $2 $3
 echo "Configured NFS..."
 
 
