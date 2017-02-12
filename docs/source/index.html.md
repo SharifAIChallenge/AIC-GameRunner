@@ -46,7 +46,7 @@ of the command, a 400 error is returned.
 
 #### Request:
 
-Post the file as the body of the request.
+PUT the file as the body of the request.
 
 #### Response:
 
@@ -62,8 +62,7 @@ The response is a JSON encoded dictionary containing the following keywords:
 
 #### Request:
 
-The request should be a JSON encoded dictionary containing the following
-keywords:
+The request should be a GET request with the following keywords:
 
 - token: A string used for referencing the file obtained in previous requests
 to the API.

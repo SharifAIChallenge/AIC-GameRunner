@@ -3,15 +3,24 @@ from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FileUploadParser
 from storage.serializers import FileSerializer
 from storage.models import File
 
 
-class FileUploadView(APIView):
-    parser_classes = (MultiPartParser, FormParser,)
+class DefaultNamedFileUploadParser(FileUploadParser):
+    def get_filename(self, *args, **kwargs):
+        name = super(DefaultNamedFileUploadParser, self).get_filename(*args, **kwargs)
+        if not name:
+            return "uploaded_file"
+        else:
+            return name
 
-    def post(self, request):
+
+class FileUploadView(APIView):
+    parser_classes = (DefaultNamedFileUploadParser, )
+
+    def put(self, request):
         serializer_data = dict()
         serializer_data['owner'] = request.auth
         serializer_data['file'] = request.data['file']
@@ -25,11 +34,12 @@ class FileUploadView(APIView):
 
 
 class FileDownloadView(APIView):
-    def post(self, request):
-        if 'token' in request.data:
+
+    def get(self, request):
+        if 'token' in request.GET:
             try:
-                file = File.objects.get(id=request.data['token'], owner=request.auth)
-                file_name = os.path.basename(file.file.name)
+                file = File.objects.get(id=request.GET['token'], owner=request.auth)
+                file_name = request.GET['token']
                 response = HttpResponse(file.file, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename="%s"' % file_name
                 return response
