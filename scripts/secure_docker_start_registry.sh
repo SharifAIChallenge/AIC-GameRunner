@@ -4,7 +4,7 @@ sudo docker rm -f /registry
 
 if [ $# -eq 1 ]
 	then
-		if [ $2 == "pull_through_cache" ]
+		if [ $1 == "pull_through_cache" ]
 			then
 				echo "Starting Registry As A Pull Through Cache."
 				sudo docker run\
