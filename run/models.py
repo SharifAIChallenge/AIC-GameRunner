@@ -204,6 +204,11 @@ class Run(models.Model):
             logger.info("Starting execution")
             client = get_docker_client()
             manager_uid = str(self.pk)
+            environment = [
+                "MANAGER_UID={}".format(manager_uid),
+            ]
+            if self.operation.manager_service:
+                environment += ["MANAGER_LISTEN_SERVICE={}".format(self.operation.manager_service)]
             manager = client.services.create(
                 image='kondor-manager',
                 resources=DockerResources(
@@ -213,9 +218,7 @@ class Run(models.Model):
                     cpu_reservation=(cpu_tot_reserve * (10 ** 9)) if cpu_tot_reserve > 0 else None,
                     mem_reservation=mem_tot_reserve if mem_tot_reserve > 0 else None,
                 ),
-                env=[
-                    "MANAGER_UID={}".format(manager_uid),
-                ],
+                env=environment,
                 restart_policy=DockerRestartPolicy(
                     condition='none'
                 ),

@@ -17,6 +17,7 @@ COMPOSE_DIRECTORY = "/compose"
 
 if __name__ == "__main__":
     manager_uid = os.environ.get("MANAGER_UID")
+    listened_container = os.environ.get("MANAGER_LISTEN_SERVICE", None)
 
     WORKING_DIR = "/compose-fin"
 
@@ -58,12 +59,17 @@ if __name__ == "__main__":
 
     logger.info("All services have been created")
 
+    filters = {
+        "label": "com.docker.stack.namespace={}".format(manager_uid),
+        "desired-state": "shutdown",
+    }
+
+    if listened_container:
+        filters["name"] = "{}_{}".format(manager_uid, listened_container)
+
     while len(client.api.tasks(
-            filters={
-                "label": "com.docker.stack.namespace={}".format(manager_uid),
-                "desired-state": "shutdown",
-            })
-    ) < len(services):
+            filters=filters
+    )) < len(services):
         time.sleep(0.5)
 
     logger.info("All services finished")

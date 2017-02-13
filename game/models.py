@@ -19,6 +19,12 @@ class Operation(models.Model):
     game = models.ForeignKey(to=Game, verbose_name=_('game'), null=False, blank=False)
     name = models.CharField(verbose_name=_('name'), max_length=100)
     config = models.TextField(verbose_name=_("docker compose yml template"), null=False)
+    # TODO: Multiple manager services
+    manager_service = models.CharField(
+        max_length=1024,
+        verbose_name=_("manager service"),
+        default=None, null=True, blank=False
+    )
     time_limit = models.IntegerField(verbose_name=_("Time limit"),
                                      help_text=_("in seconds. "
                                                  "WARNING: this time limit is not strict. "
