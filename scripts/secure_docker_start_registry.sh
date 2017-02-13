@@ -56,6 +56,6 @@ then
             --name registry\
             registry:2
 else
-    echo "Usage: secure_docker_start_registry.sh <certificate_name> [pull_through_cache]"
+    echo "Usage: secure_docker_start_registry.sh <username> <password> [pull_through_cache]"
     exit 1
 fi
