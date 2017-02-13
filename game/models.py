@@ -11,6 +11,9 @@ __all__ = ["Game", "Operation", "OperationResource", "OperationParameter"]
 class Game(models.Model):
     name = models.CharField(verbose_name=_('name'), max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class Operation(models.Model):
     game = models.ForeignKey(to=Game, verbose_name=_('game'), null=False, blank=False)
@@ -28,8 +31,8 @@ class Operation(models.Model):
     class Meta:
         unique_together = (("game", "name"), )
 
-    def __unicode__(self):
-        return self.name
+    def __str__(self):
+        return "{}:{}".format(str(self.game), self.name)
 
 
 class OperationResource(models.Model):
@@ -39,6 +42,9 @@ class OperationResource(models.Model):
 
     class Meta:
         unique_together = (("operation", "name"), )
+
+    def __str__(self):
+        return "{}:{}".format(str(self.operation), self.name)
 
 
 class OperationParameter(models.Model):
@@ -56,3 +62,6 @@ class OperationParameter(models.Model):
 
     class Meta:
         unique_together = (("operation", "name"), )
+
+    def __str__(self):
+        return "{}:{}".format(str(self.game), self.name)
