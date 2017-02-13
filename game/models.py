@@ -64,4 +64,4 @@ class OperationParameter(models.Model):
         unique_together = (("operation", "name"), )
 
     def __str__(self):
-        return "{}:{}".format(str(self.game), self.name)
+        return "{}:{}".format(str(self.operation), self.name)
