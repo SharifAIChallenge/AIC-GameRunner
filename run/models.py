@@ -189,9 +189,9 @@ class Run(models.Model):
                 if service_memory_constraint[-1].upper() == 'K':
                     memlim_sum += int(service_memory_constraint[:-1]) * 1024
                 elif service_memory_constraint[-1].upper() == 'M':
-                    memlim_sum += int(service_memory_constraint[-1]) * 1024 * 1024
+                    memlim_sum += int(service_memory_constraint[:-1]) * 1024 * 1024
                 elif service_memory_constraint[-1].upper() == 'G':
-                    memlim_sum += int(service_memory_constraint[-1]) * 1024 * 1024 * 1024
+                    memlim_sum += int(service_memory_constraint[:-1]) * 1024 * 1024 * 1024
                 else:
                     raise TypeError
 
