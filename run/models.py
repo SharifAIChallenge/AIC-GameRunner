@@ -92,7 +92,7 @@ class Run(models.Model):
     status = models.SmallIntegerField(choices=status_choices, default=PENDING)
 
     def __str__(self):
-        return "{}:{}".format(str(self.game), self.pk)
+        return "{}:{}".format(str(self.operation), self.pk)
 
     def compile_compose_file(self):
         # Section 0: Set run status to running
