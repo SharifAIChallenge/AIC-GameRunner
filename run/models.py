@@ -216,7 +216,7 @@ class Run(models.Model):
                     if MANAGER_CPU_LIMIT is not None else None,
                     mem_limit=int(MANAGER_MEMORY_LIMIT) if MANAGER_MEMORY_LIMIT is not None else None,
                     cpu_reservation=(cpu_tot_reserve * (10 ** 9)) if cpu_tot_reserve > 0 else None,
-                    mem_reservation=mem_tot_reserve if mem_tot_reserve > 0 else None,
+                    mem_reservation=int(mem_tot_reserve) if mem_tot_reserve > 0 else None,
                 ),
                 env=environment,
                 restart_policy=DockerRestartPolicy(
