@@ -293,6 +293,7 @@ class Run(models.Model):
                         with open(context[parameter.name]) as file:
                             file_ = File()
                             file_.file.save(parameter.name, DjangoFile(file))
+                            file_.owner = self.owner
                             file_.save()
                             parameter_value = ParameterValue(run=self, parameter=parameter)
                             parameter_value.value = file_
