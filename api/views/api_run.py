@@ -1,9 +1,11 @@
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+from rest_framework.serializers import ListSerializer
 from rest_framework.views import APIView
 
 from api.serializers import RunCreateSerializer, RunReportSerializer
+from api.views.utils import define_coreapi_field
 from run.models import Run
 import datetime
 
@@ -12,6 +14,7 @@ class RunCreateView(APIView):
     parser_classes = (JSONParser,)
 
     def post(self, request):
+        # TODO: Use a ListSerializer
         runs_json = JSONParser().parse(request)
         # validate if the data is a list
         if not isinstance(runs_json, list):
@@ -32,11 +35,16 @@ class RunCreateView(APIView):
                 })
         return Response(result, status=status.HTTP_200_OK)
 
+    def get_serializer(self):
+        return RunCreateSerializer(many=True)
+
 
 class RunReportView(APIView):
+    @define_coreapi_field(name="time", location="query", required=True, type="float", )
     def get(self, request):
         data = request.GET
         # todo put the last time report view is called as default for 'time' param.
+        # TODO Use filters
         if 'time' in data:
             try:
                 from_time = datetime.datetime.fromtimestamp(float(data['time']))

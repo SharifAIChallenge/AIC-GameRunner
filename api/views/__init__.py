@@ -1,2 +1,2 @@
-from . import api_storage, game_run, api_run
-__all__ = [api_storage, game_run, api_run]
+from . import api_storage, api_run, schema
+__all__ = [api_storage, api_run, schema]
