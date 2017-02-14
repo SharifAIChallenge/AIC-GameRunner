@@ -135,6 +135,8 @@ AUTH_USER_MODEL = 'auth.User'
 # The absolute path to nfs-folder synced across all instances.
 NFS_DIR = '/nfs/'
 DOCKER_REGISTRY_URL = 'localhost:5000'
+DOCKER_REGISTRY_USERNAME = 'username'
+DOCKER_REGISTRY_PASSWORD = 'password'
 DOCKER_HOST = None  # Set to None to use docker's default.
 
 CELERY_BEAT_SCHEDULE = {
