@@ -233,7 +233,7 @@ class Run(models.Model):
 
             print ("Invoking service with command {}".format(manager_service_creation_command))
 
-            subprocess.call(manager_service_creation_command)
+            subprocess.call(manager_service_creation_command, shell=True)  # TODO : Use list instead of string
 
             manager = client.services.list(filters={"name": manager_uid})
             if len(manager) != 1:
