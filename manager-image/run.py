@@ -12,6 +12,10 @@ import subprocess
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+streamLogger = logging.StreamHandler()
+streamLogger.setLevel(logging.INFO)
+logger.addHandler(streamLogger)
+
 UID_ENVIRONMENT_KEY = "MANAGER_UID"
 COMPOSE_DIRECTORY = "/compose"
 
