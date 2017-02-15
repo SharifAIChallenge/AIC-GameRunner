@@ -206,7 +206,7 @@ class Run(models.Model):
             client = get_docker_client()
             manager_uid = str(self.pk)
 
-            manager_service_spec = ["docker_service_create", "--name {}".format(manager_uid), ]
+            manager_service_spec = ["docker service create", "--name {}".format(manager_uid), ]
 
             manager_service_spec.append("-e MANAGER_UID={}".format(manager_uid))
             if self.operation.manager_service:
