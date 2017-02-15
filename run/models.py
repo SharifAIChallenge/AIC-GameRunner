@@ -77,7 +77,7 @@ class Run(models.Model):
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
     queue_reference_id = models.CharField(null=True, max_length=200)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
+    owner = models.ForeignKey("api.Token", null=True, blank=True)
     log = models.TextField()
     # choices for the status
     PENDING = 0
