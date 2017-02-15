@@ -23,7 +23,7 @@ class RunCreateView(APIView):
         for run_json in runs_json:
             serializer = RunCreateSerializer(data=run_json)
             if serializer.is_valid():
-                run = serializer.save()
+                run = serializer.save(owner=request.auth)
                 result.append({
                     'success': True,
                     'run_id': run.id

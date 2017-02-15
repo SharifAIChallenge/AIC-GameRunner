@@ -77,7 +77,7 @@ class RunCreateSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        run = Run(operation=validated_data['operation'])
+        run = Run(operation=validated_data['operation'], owner=validated_data['owner'])
         run.save()
         for parameter_value_data in validated_data['parameters']:
             ParameterValue.objects.create(
