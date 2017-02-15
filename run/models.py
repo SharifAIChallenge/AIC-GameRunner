@@ -13,6 +13,7 @@ import tempfile
 import os
 import shutil
 import yaml
+import subprocess
 
 import docker
 from docker.types import Resources as DockerResources
@@ -204,40 +205,40 @@ class Run(models.Model):
             logger.info("Starting execution")
             client = get_docker_client()
             manager_uid = str(self.pk)
-            environment = [
-                "MANAGER_UID={}".format(manager_uid),
-            ]
+
+            manager_service_spec = ["docker_service_create", "--name {}".format(manager_uid), ]
+
+            manager_service_spec.append("-e MANAGER_UID={}".format(manager_uid))
             if self.operation.manager_service:
-                environment += ["MANAGER_LISTEN_SERVICE={}".format(self.operation.manager_service)]
-            manager = client.services.create(
-                image='kondor-manager',
-                resources=DockerResources(
-                    cpu_limit=str(int(MANAGER_CPU_LIMIT * (10 ** 9)))
-                    if MANAGER_CPU_LIMIT is not None else None,
-                    mem_limit=str(int(MANAGER_MEMORY_LIMIT)) if MANAGER_MEMORY_LIMIT is not None else None,
-                    cpu_reservation=str(int(cpu_tot_reserve * (10 ** 9))) if cpu_tot_reserve > 0 else None,
-                    mem_reservation=str(int(mem_tot_reserve)) if mem_tot_reserve > 0 else None,
-                ),
-                env=environment,
-                restart_policy=DockerRestartPolicy(
-                    condition='none'
-                ),
-                mounts=[
-                    DockerMount(
-                        source=shared_path,
-                        target="/compose",
-                        type='bind',
-                    ),
-                    DockerMount(
-                        # TODO: Can we use a more general term here e.g. settings.DOCKER_HOST?
-                        source='/var/run/docker.sock',
-                        target='/var/run/docker.sock',
-                        type='bind',
-                        read_only=True
-                    ),
-                ],
-                name="{}".format(manager_uid),
-            )
+                manager_service_spec.append("-e MANAGER_LISTEN_SERVICE={}".format(
+                    self.operation.manager_service
+                ))
+
+            if MANAGER_CPU_LIMIT:
+                manager_service_spec.append("--limit-cpu={}".format(MANAGER_CPU_LIMIT))
+            if MANAGER_MEMORY_LIMIT:
+                manager_service_spec.append("--limit-memory={}B".format(MANAGER_MEMORY_LIMIT))
+            if cpu_tot_reserve > 0:
+                manager_service_spec.append("--reserve-cpu={}".format(cpu_tot_reserve))
+            if mem_tot_reserve > 0:
+                manager_service_spec.append("--reserve-memory={}B".format(mem_tot_reserve))
+
+            manager_service_spec.append('--restart-condition="none"')
+            manager_service_spec.append('--mount type=bind,src={},dst=/compose'.format(shared_path))
+            manager_service_spec.append('--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock')
+
+            manager_service_spec.append('kondor-manager') # TODO: Allow custom manager image name using settings
+
+            manager_service_creation_command = ' '.join(manager_service_spec)
+
+            print ("Invoking service with command {}".format(manager_service_creation_command))
+
+            subprocess.call(manager_service_creation_command)
+
+            manager = client.services.list(filters={"name": manager_uid})
+            if len(manager) != 1:
+                raise AssertionError("Service should have been created")
+            manager = manager[0]
 
             # TODO: Use docker interface to wait for the manager
             # TODO: Time limit
@@ -293,7 +294,7 @@ class Run(models.Model):
                         self.log += "ERROR: Parameter {} not found.\n"
                         failed = True
                     else:
-                        with open(context[parameter.name]) as file:
+                        with open(context[parameter.name], 'rb') as file:
                             file_ = File()
                             file_.file.save(parameter.name, DjangoFile(file))
                             file_.owner = self.owner
