@@ -214,6 +214,9 @@ class Run(models.Model):
                     self.operation.manager_service
                 ))
 
+            cpu_tot_reserve = int(cpu_tot_reserve)
+            mem_tot_reserve = int(mem_tot_reserve)
+
             if MANAGER_CPU_LIMIT:
                 manager_service_spec.append("--limit-cpu={}".format(MANAGER_CPU_LIMIT))
             if MANAGER_MEMORY_LIMIT:
