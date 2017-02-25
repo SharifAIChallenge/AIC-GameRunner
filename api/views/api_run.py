@@ -8,6 +8,7 @@ from api.serializers import RunCreateSerializer, RunReportSerializer
 from api.views.utils import define_coreapi_field
 from run.models import Run
 import datetime
+from django.utils import timezone
 
 
 class RunCreateView(APIView):
@@ -47,7 +48,7 @@ class RunReportView(APIView):
         # TODO Use filters
         if 'time' in data:
             try:
-                from_time = datetime.datetime.fromtimestamp(float(data['time']))
+                from_time = timezone.make_aware(datetime.datetime.fromtimestamp(float(data['time'])), timezone=timezone.utc)
             except ValueError:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:

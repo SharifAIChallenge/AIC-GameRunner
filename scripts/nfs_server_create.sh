@@ -21,7 +21,7 @@ chown nobody:nogroup $1
 printf "$1" > /etc/exports
 for ip in $2
 do
-    printf " $ip(rw,sync,no_subtree_check)" >> /etc/exports
+    printf " $ip(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
 done
 echo '' >> /etc/exports
 

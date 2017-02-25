@@ -14,6 +14,7 @@ import os
 import shutil
 import yaml
 import subprocess
+from django.utils import timezone
 
 import docker
 from docker.types import Resources as DockerResources
@@ -98,7 +99,7 @@ class Run(models.Model):
     def compile_compose_file(self):
         # Section 0: Set run status to running
         logger.info("Starting execution of run {}".format(str(self)))
-        self.start_time = datetime.now()
+        self.start_time = timezone.now()
         self.status = self.RUNNING
         self.queue_reference_id = None  # Releasing queue id
         self.save()
@@ -310,7 +311,7 @@ class Run(models.Model):
                             parameter_value.save()
 
         self.status = self.FAILURE if failed else self.SUCCESS
-        self.end_time = datetime.now()
+        self.end_time = timezone.now()
         self.save()
         logging.info("Done. status: {}".format("failed" if failed else "success"))
 
