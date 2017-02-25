@@ -285,7 +285,7 @@ class Run(models.Model):
             #for service in services:
             #    service.remove()
             
-            subprocess.call( "docker stack rm {}".format(manager_uid).split() , shell=True )
+            subprocess.call( "docker stack rm {}".format(manager_uid) , shell=True )
 
             logging.info("Execution finished")
             # Section 5: Save outputs. Set run status to success
