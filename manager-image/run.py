@@ -70,10 +70,13 @@ if __name__ == "__main__":
 
     if listened_container:
         filters["name"] = "{}_{}".format(manager_uid, listened_container)
+        important_services_count = 1
+    else:
+        important_services_count = len(services)
 
     while len(client.api.tasks(
             filters=filters
-    )) < len(services):
+    )) < important_services_count:
         time.sleep(0.5)
 
     logger.info("All services finished")
