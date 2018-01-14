@@ -23,7 +23,7 @@ authenticate successfully if the request is made through one of those addresses.
 ```
 # With shell, you can just pass the correct header with each request
 curl "api_endpoint_here"
-  -H "Authorization: <your_token_goes_here>"
+  -H "Authorization: Token <your_token_goes_here>"
 ```
 
 # API commands
