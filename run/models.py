@@ -148,6 +148,7 @@ class Run(models.Model):
                         open(template_value, 'a').close()  # Touch the file, making sure it exists
                     context[parameter.name] = template_value
 
+
                 # TODO: Resources are used for different purposes. Separate them.
 
                 for resource in self.operation.resources.all():
@@ -167,6 +168,7 @@ class Run(models.Model):
                 rendered_compose_file = template.render(Context(context))
 
                 compiled_compose_file_path = os.path.join(shared_path, COMPOSE_FILE_NAME)
+                logger.warning(rendered_compose_file)
                 with open(compiled_compose_file_path, "w") as file:
                     file.write(rendered_compose_file)
 
@@ -177,6 +179,7 @@ class Run(models.Model):
 
             memlim_sum = 0.0
             cpulim_sum = 0.0
+            print(compiled_compose_file_path)
             compose = ConfigFile.from_filename(compiled_compose_file_path)
             for service_name in compose.get_service_dicts():
                 service = compose.get_service(service_name)
@@ -237,11 +240,17 @@ class Run(models.Model):
 
             print ("Invoking service with command {}".format(manager_service_creation_command))
 
+            subprocess.call('docker images', shell=True)  # TODO : Use list instead of string
             subprocess.call(manager_service_creation_command, shell=True)  # TODO : Use list instead of string
+            subprocess.call('docker images', shell=True)  # TODO : Use list instead of string
 
+            time.sleep(5)
             manager = client.services.list(filters={"name": manager_uid})
-            if len(manager) != 1:
+            print( "manager len={}".format(len(manager)) );
+            if len(manager) == 0:
                 raise AssertionError("Service should have been created")
+            elif len(manager) != 1:
+                print( "len(manager) is greater than 1\n" + str(manager) );
             manager = manager[0]
 
             # TODO: Use docker interface to wait for the manager
@@ -263,12 +272,14 @@ class Run(models.Model):
                 current_time = time.time()
                 if current_time - start_time > self.operation.time_limit:
                     failed = True
+                    logging.info("ERROR: Timeout")
                     self.log += "ERROR: Killing manager due to timeout after {} seconds\n".format(
                         current_time - start_time
                     )
                     break
                 time.sleep(STATUS_CHECK_PERIOD)
 
+           
             logging.info("Cleaning up")
             manager.remove()
 

@@ -83,6 +83,22 @@ DATABASES = {
     }
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
@@ -135,8 +151,8 @@ AUTH_USER_MODEL = 'auth.User'
 # The absolute path to nfs-folder synced across all instances.
 NFS_DIR = '/nfs/'
 DOCKER_REGISTRY_URL = 'localhost:5000'
-DOCKER_REGISTRY_USERNAME = 'username'
-DOCKER_REGISTRY_PASSWORD = 'password'
+DOCKER_REGISTRY_USERNAME = 'modir'
+DOCKER_REGISTRY_PASSWORD = 'tandorost'
 DOCKER_HOST = None  # Set to None to use docker's default.
 
 CELERY_BEAT_SCHEDULE = {
