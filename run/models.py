@@ -1,8 +1,10 @@
-from datetime import datetime
+import json
 
 from django.db import models
 from django.template import Engine, Context
 from django.core.files import File as DjangoFile
+
+import requests
 
 from game_runner.utils import get_docker_client
 from storage.models import File
@@ -12,7 +14,6 @@ import uuid
 import tempfile
 import os
 import shutil
-import yaml
 import subprocess
 from django.utils import timezone
 
@@ -78,6 +79,7 @@ class Run(models.Model):
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
     queue_reference_id = models.CharField(null=True, max_length=200)
+    response_queue_reference_id = models.CharField(null=True, max_length=200)
     owner = models.ForeignKey("api.Token", null=True, blank=True)
     log = models.TextField()
     # choices for the status
@@ -91,7 +93,16 @@ class Run(models.Model):
         (RUNNING, 'Running'),
         (FAILURE, 'Failure'),
     )
+    WAITING = 0
+    SENDING = 1
+    SENT = 2
+    response_choices = (
+        (WAITING, 'Wating'),
+        (SENDING, 'Sending'),
+        (SENT, 'Sent'),
+    )
     status = models.SmallIntegerField(choices=status_choices, default=PENDING)
+    response = models.SmallIntegerField(choices=response_choices, default=WAITING)
 
     def __str__(self):
         return "{}:{}".format(str(self.operation), self.pk)
@@ -179,7 +190,6 @@ class Run(models.Model):
 
             memlim_sum = 0.0
             cpulim_sum = 0.0
-            print(compiled_compose_file_path)
             compose = ConfigFile.from_filename(compiled_compose_file_path)
             for service_name in compose.get_service_dicts():
                 service = compose.get_service(service_name)
@@ -323,9 +333,24 @@ class Run(models.Model):
 
         self.status = self.FAILURE if failed else self.SUCCESS
         self.end_time = timezone.now()
+        self.response = self.SENDING
         self.save()
         logging.info("Done. status: {}".format("failed" if failed else "success"))
 
-
-
-
+    def send_response(self):
+        response = []
+        response.append({'id': self.id})
+        response.append({'operation': self.operation})
+        response.append({'status': self.status})
+        response.append({'end_time': self.end_time})
+        response.append({'log': self.log})
+        parameters = []
+        for parameter_value in self.parameter_value_set.all().filter(parameter__is_input=False):
+            parameters.append({parameter_value.parameter.name: parameter_value.value})
+        response.append({'parameters': parameters})
+        headers = {'Authorization': 'Token{}'.format(self.owner.key)}
+        res = requests.post(settings.SITE_URL, data=json.dumps(response), headers=headers)
+        logging.log(logging.DEBUG, res.text)
+        if res.text == 'OK':
+            self.response = self.SENT
+            self.save()
