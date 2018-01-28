@@ -155,9 +155,15 @@ DOCKER_REGISTRY_USERNAME = 'modir'
 DOCKER_REGISTRY_PASSWORD = 'tandorost'
 DOCKER_HOST = None  # Set to None to use docker's default.
 
+SITE_URL = 'localhost:1234'
+
 CELERY_BEAT_SCHEDULE = {
     'periodic_check_for_missed_runs': {
         'task': 'run.tasks.periodic_check_for_missed_runs',
+        'schedule': 10.0,
+    },
+    'periodic_check_for_sending_responses': {
+        'task': 'run.tasks.periodic_check_for_sending_responses',
         'schedule': 10.0,
     }
 }
