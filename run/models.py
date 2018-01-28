@@ -341,6 +341,9 @@ class Run(models.Model):
         headers = {'Authorization': 'Token{}'.format(self.owner.key)}
         res = requests.post(settings.SITE_URL, data=json.dumps(response), headers=headers)
         logging.log(logging.DEBUG, res.text)
+
         if res.text == 'OK':
             self.response = self.SENT
-            self.save()
+        else:
+            self.response_queue_reference_id = None
+        self.save()

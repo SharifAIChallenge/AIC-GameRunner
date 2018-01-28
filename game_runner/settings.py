@@ -164,7 +164,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'periodic_check_for_sending_responses': {
         'task': 'run.tasks.periodic_check_for_sending_responses',
-        'schedule': 10.0,
+        'schedule': 30.0,
     }
 }
 
