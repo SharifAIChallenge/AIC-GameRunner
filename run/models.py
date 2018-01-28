@@ -25,7 +25,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class ParameterValue(models.Model):
     _value = models.TextField()
     run = models.ForeignKey('Run', related_name='parameter_value_set')
@@ -64,7 +63,6 @@ class ParameterValue(models.Model):
                 shutil.copy(self.value.file.path, parameter_path)
                 return parameter_path
         raise AssertionError("Unsupported parameter")
-
 
 class Run(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -176,7 +174,6 @@ class Run(models.Model):
                 with open(compiled_compose_file_path, "w") as file:
                     file.write(rendered_compose_file)
 
-
             # Section 4: Provide config file to the manager node and run it
 
             # TODO: Use docker-compose interface to calculate sum of limits
@@ -282,7 +279,6 @@ class Run(models.Model):
                     break
                 time.sleep(STATUS_CHECK_PERIOD)
 
-           
             logging.info("Cleaning up")
             manager.remove()
 
@@ -294,11 +290,10 @@ class Run(models.Model):
             # in a specific manner. This must be changed to be implemented
             # using the API.
 
-            
             #services = client.services.list(filters={"name": "{}_".format(manager_uid)})
             #for service in services:
             #    service.remove()
-            
+
             subprocess.call( "docker stack rm {}".format(manager_uid) , shell=True )
 
             logging.info("Execution finished")
@@ -333,7 +328,7 @@ class Run(models.Model):
     def send_response(self):
         from api.serializers import RunReportSerializer
 
-        headers = {'Authorization': 'Token{}'.format(self.owner.key)}
+        headers = {'Authorization': '{}'.format(self.owner.key)}
         serializer = RunReportSerializer(self)
         serializer.data['id'] = str(serializer.data['id'])
         data = json.dumps(serializer.data)
@@ -341,7 +336,7 @@ class Run(models.Model):
         try:
             res = requests.post(settings.SITE_URL, data=data, headers=headers)
             logger.info(res.text)
-            if res.text == 'OK':
+            if res.status == 200:
                 self.response = self.SENT
             else:
                 self.response_queue_reference_id = None
