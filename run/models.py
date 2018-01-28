@@ -338,11 +338,14 @@ class Run(models.Model):
         serializer.data['id'] = str(serializer.data['id'])
         data = json.dumps(serializer.data)
         logger.info("data to send: " + data)
-        res = requests.post(settings.SITE_URL, data=data, headers=headers)
-        logger.info(res.text)
-
-        if res.text == 'OK':
-            self.response = self.SENT
-        else:
+        try:
+            res = requests.post(settings.SITE_URL, data=data, headers=headers)
+            logger.info(res.text)
+            if res.text == 'OK':
+                self.response = self.SENT
+            else:
+                self.response_queue_reference_id = None
+        except Exception as e:
+            logger.exception(e)
             self.response_queue_reference_id = None
         self.save()
