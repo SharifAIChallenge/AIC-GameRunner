@@ -17,12 +17,6 @@ import shutil
 import subprocess
 from django.utils import timezone
 
-import docker
-from docker.types import Resources as DockerResources
-from docker.types import RestartPolicy as DockerRestartPolicy
-from docker.types import Mount as DockerMount
-
-
 import time
 
 from compose.config.config import ConfigFile
@@ -158,7 +152,6 @@ class Run(models.Model):
                         template_value = os.path.join(shared_path, parameter.name)
                         open(template_value, 'a').close()  # Touch the file, making sure it exists
                     context[parameter.name] = template_value
-
 
                 # TODO: Resources are used for different purposes. Separate them.
 
@@ -331,19 +324,16 @@ class Run(models.Model):
                             parameter_value.value = file_
                             parameter_value.save()
 
-        self.status = self.FAILURE if failed else self.SUCCESS
-        self.end_time = timezone.now()
-        self.response = self.SENDING
-        self.save()
-        logging.info("Done. status: {}".format("failed" if failed else "success"))
+            self.status = self.FAILURE if failed else self.SUCCESS
+            self.end_time = timezone.now()
+            self.response = self.SENDING
+            self.save()
+            logging.info("Done. status: {}".format("failed" if failed else "success"))
 
     def send_response(self):
-        response = []
-        response.append({'id': self.id})
-        response.append({'operation': self.operation})
-        response.append({'status': self.status})
-        response.append({'end_time': self.end_time})
-        response.append({'log': self.log})
+        response = [{'id': self.id}, {'operation': self.operation},
+                    {'status': self.status}, {'end_time': self.end_time},
+                    {'log': self.log}]
         parameters = []
         for parameter_value in self.parameter_value_set.all().filter(parameter__is_input=False):
             parameters.append({parameter_value.parameter.name: parameter_value.value})
