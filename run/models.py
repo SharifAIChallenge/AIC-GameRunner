@@ -6,6 +6,7 @@ from django.core.files import File as DjangoFile
 
 import requests
 
+from api.serializers import RunReportSerializer
 from game_runner.utils import get_docker_client
 from storage.models import File
 from game_runner import settings
@@ -331,16 +332,12 @@ class Run(models.Model):
             logging.info("Done. status: {}".format("failed" if failed else "success"))
 
     def send_response(self):
-        response = [{'id': self.id}, {'operation': self.operation},
-                    {'status': self.status}, {'end_time': self.end_time},
-                    {'log': self.log}]
-        parameters = []
-        for parameter_value in self.parameter_value_set.all().filter(parameter__is_input=False):
-            parameters.append({parameter_value.parameter.name: parameter_value.value})
-        response.append({'parameters': parameters})
         headers = {'Authorization': 'Token{}'.format(self.owner.key)}
-        res = requests.post(settings.SITE_URL, data=json.dumps(response), headers=headers)
-        logging.log(logging.DEBUG, res.text)
+        serializer = RunReportSerializer(self)
+        data = json.dumps(serializer.data)
+        logger.info("data to send: " + data)
+        res = requests.post(settings.SITE_URL, data=data, headers=headers)
+        logger.info(res.text)
 
         if res.text == 'OK':
             self.response = self.SENT
