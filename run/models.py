@@ -3,6 +3,7 @@ import json
 from django.db import models
 from django.template import Engine, Context
 from django.core.files import File as DjangoFile
+from django.core.files.base import ContentFile as DjangoContentFile
 import requests
 
 from game_runner.utils import get_docker_client
@@ -95,6 +96,8 @@ class Run(models.Model):
     status = models.SmallIntegerField(choices=status_choices, default=PENDING)
     response = models.SmallIntegerField(choices=response_choices, default=WAITING)
 
+    service_log = models.FileField(upload_to='logs/',
+                                   null=True)
     def __str__(self):
         return "{}:{}".format(str(self.operation), self.pk)
 
@@ -277,6 +280,18 @@ class Run(models.Model):
                     )
                     break
                 time.sleep(STATUS_CHECK_PERIOD)
+
+            # Logging
+            logger.info("Save log files")
+            services = client.services.list(filters={"name": manager_uid})
+            buffer = ""
+            for service in services:
+                result = subprocess.Popen("docker service logs {}".format(manager_uid).split(),
+                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out, err = result.communicate()
+                buffer = "{}{}-{}-{}\n\n{}\n\n\n".format(buffer, service.short_id, service.id, service.short_id,
+                                                         out)
+            self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
 
             logging.info("Cleaning up")
             manager.remove()
