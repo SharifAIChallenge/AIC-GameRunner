@@ -3,7 +3,6 @@ import json
 from django.db import models
 from django.template import Engine, Context
 from django.core.files import File as DjangoFile
-
 import requests
 
 from game_runner.utils import get_docker_client
@@ -331,12 +330,13 @@ class Run(models.Model):
         headers = {'Authorization': '{}'.format(self.owner.key)}
         serializer = RunReportSerializer(self)
         serializer.data['id'] = str(serializer.data['id'])
-        data = json.dumps(serializer.data)
-        logger.info("data to send: " + data)
+        data = serializer.data
         try:
+            data = json.dumps(data)
+            logger.info("TESTIG JSON " + str(data))
             res = requests.post(settings.SITE_URL, data=data, headers=headers)
-            logger.info(res.text)
-            if res.status == 200:
+            logger.info(res.status_code)
+            if res.status_code == 200:
                 self.response = self.SENT
             else:
                 self.response_queue_reference_id = None
