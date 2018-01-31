@@ -155,7 +155,7 @@ DOCKER_REGISTRY_USERNAME = 'modir'
 DOCKER_REGISTRY_PASSWORD = 'tandorost'
 DOCKER_HOST = None  # Set to None to use docker's default.
 
-SITE_URL = 'http://localhost:1234'
+SITE_URL = 'http://aichallenge.sharif.edu:2016/game/api/report/'
 
 CELERY_BEAT_SCHEDULE = {
     'periodic_check_for_missed_runs': {
