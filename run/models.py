@@ -287,10 +287,11 @@ class Run(models.Model):
             services = client.services.list(filters={"name": manager_uid})
             buffer = ""
             for service in services:
-                result = subprocess.Popen("docker service logs {}".format(manager_uid).split(),
+                logger.info("Service {} {} saving ...".format(service.name, service.id))
+                result = subprocess.Popen("docker service logs {}".format(service.id).split(),
                                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 out, err = result.communicate()
-                buffer = "{}{}-{}-{}\n\n{}\n\n\n".format(buffer, service.short_id, service.id, service.short_id,
+                buffer = "{}{}-{}-{}\n\n{}\n\n\n".format(buffer, service.name, service.id, service.short_id,
                                                          out)
             self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
 
