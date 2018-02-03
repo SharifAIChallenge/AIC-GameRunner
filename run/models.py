@@ -289,9 +289,9 @@ class Run(models.Model):
             for service in services:
                 logger.info("Service {} {} saving ...".format(service.name, service.id))
                 result = subprocess.Popen("docker service logs {}".format(service.id).split(),
-                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 out, err = result.communicate()
-                buffer = "{}{}-{}-{}\n\n{}\n\n\n".format(buffer, service.name, service.id, service.short_id,
+                buffer = "{}Service {}-{}-{}\n\n{}\n\n\n".format(buffer, service.name, service.id, service.short_id,
                                                          out)
             self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
 
