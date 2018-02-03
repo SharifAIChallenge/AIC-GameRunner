@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'game_runner.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'game_runner',
+        'USER': 'aichallenge',
+        'PASSWORD': 'aichallenge',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -151,8 +155,8 @@ AUTH_USER_MODEL = 'auth.User'
 # The absolute path to nfs-folder synced across all instances.
 NFS_DIR = '/nfs/'
 DOCKER_REGISTRY_URL = 'localhost:5000'
-DOCKER_REGISTRY_USERNAME = 'modir'
-DOCKER_REGISTRY_PASSWORD = 'tandorost'
+DOCKER_REGISTRY_USERNAME = 'aichallenge'
+DOCKER_REGISTRY_PASSWORD = 'aichallenge'
 DOCKER_HOST = None  # Set to None to use docker's default.
 
 SITE_URL = 'http://aichallenge.sharif.edu:2016/game/api/report/'
