@@ -4,10 +4,7 @@ from django.db import models
 from django.template import Engine, Context
 from django.core.files import File as DjangoFile
 from django.core.files.base import ContentFile as DjangoContentFile
-<<<<<<< HEAD
 
-=======
->>>>>>> production
 import requests
 
 from game_runner.utils import get_docker_client
