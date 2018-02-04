@@ -4,7 +4,10 @@ from django.db import models
 from django.template import Engine, Context
 from django.core.files import File as DjangoFile
 from django.core.files.base import ContentFile as DjangoContentFile
+<<<<<<< HEAD
 
+=======
+>>>>>>> production
 import requests
 
 from game_runner.utils import get_docker_client
@@ -237,6 +240,7 @@ class Run(models.Model):
             manager_service_spec.append('--restart-condition="none"')
             manager_service_spec.append('--mount type=bind,src={},dst=/compose'.format(shared_path))
             manager_service_spec.append('--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock')
+            manager_service_spec.append('--detach=true')
 
             manager_service_spec.append('kondor-manager') # TODO: Allow custom manager image name using settings
 
@@ -288,9 +292,12 @@ class Run(models.Model):
             services = client.services.list(filters={"name": manager_uid})
             buffer = ""
             for service in services:
-                result = subprocess.Popen("docker service logs {}".format(manager_uid).split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                logger.info("Service {} {} saving ...".format(service.name, service.id))
+                result = subprocess.Popen("docker service logs {}".format(service.id).split(),
+                                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 out, err = result.communicate()
-                buffer = "{}{}-{}-{}\n\n{}\n\n\n".format(buffer, service.short_id, service.id, service.short_id, out)
+                buffer = "{}Service {}-{}-{}\n\n{}\n\n\n".format(buffer, service.name, service.id, service.short_id,
+                                                         out)
             self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
 
             logging.info("Cleaning up")
@@ -345,12 +352,13 @@ class Run(models.Model):
         headers = {'Authorization': '{}'.format(self.owner.key)}
         serializer = RunReportSerializer(self)
         serializer.data['id'] = str(serializer.data['id'])
-        data = json.dumps(serializer.data)
-        logger.info("data to send: " + data)
+        data = serializer.data
         try:
+            data = json.dumps(data)
+            logger.info("TESTIG JSON " + str(data))
             res = requests.post(settings.SITE_URL, data=data, headers=headers)
-            logger.info(res.text)
-            if res.status == 200:
+            logger.info(res.status_code)
+            if res.status_code == 200:
                 self.response = self.SENT
             else:
                 self.response_queue_reference_id = None
