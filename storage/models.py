@@ -10,3 +10,5 @@ class File(models.Model):
     owner = models.ForeignKey(Token, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to='uploads')
+    def __str__(self):
+        return '{}:{}'.format(self.id, self.owner)

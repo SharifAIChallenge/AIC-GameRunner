@@ -245,9 +245,7 @@ class Run(models.Model):
 
             print ("Invoking service with command {}".format(manager_service_creation_command))
 
-            subprocess.call('docker images', shell=True)  # TODO : Use list instead of string
             subprocess.call(manager_service_creation_command, shell=True)  # TODO : Use list instead of string
-            subprocess.call('docker images', shell=True)  # TODO : Use list instead of string
 
             time.sleep(5)
             manager = client.services.list(filters={"name": manager_uid})
@@ -288,13 +286,14 @@ class Run(models.Model):
             logger.info("Save log files")
             services = client.services.list(filters={"name": manager_uid})
             buffer = ""
+            logger.info(len(services))
             for service in services:
                 logger.info("Service {} {} saving ...".format(service.name, service.id))
-                result = subprocess.Popen("docker service logs {}".format(service.id).split(),
+                result = subprocess.run("docker service logs {}".format(service.id).split(),
                                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                out, err = result.communicate()
+                out = result.stdout
                 buffer = "{}Service {}-{}-{}\n\n{}\n\n\n".format(buffer, service.name, service.id, service.short_id,
-                                                         out)
+                                                         out.decode("utf-8"))
             self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
 
             logging.info("Cleaning up")
