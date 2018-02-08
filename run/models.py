@@ -174,7 +174,7 @@ class Run(models.Model):
                 rendered_compose_file = template.render(Context(context))
 
                 compiled_compose_file_path = os.path.join(shared_path, COMPOSE_FILE_NAME)
-                logger.warning(rendered_compose_file)
+                logger.info(rendered_compose_file)
                 with open(compiled_compose_file_path, "w") as file:
                     file.write(rendered_compose_file)
 
