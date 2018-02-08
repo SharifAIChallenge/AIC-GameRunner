@@ -9,3 +9,4 @@ docker-compose
 coreapi==2.3.3
 psycopg2
 requests==2.18.4
+Fabric==1.14.0
