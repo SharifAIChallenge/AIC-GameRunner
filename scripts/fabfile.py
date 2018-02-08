@@ -34,9 +34,12 @@ def mount_nfs():
     run('echo "{}:/nfs /nsf nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0" >> /etc/fstab'.format(ip))
 
 
+images = ["aic_py3_image", "kondor-manager", "aic_cpp_image", "aic_java_image",
+          "aic_client_image", "aic_server_image"]
+
+
 def push_images():
     ip = get_ip()
-    images = ["aic_py3_image", "kondor-manager", "aic_cpp_image", "aic_java_image", "aic_client_image", "aic_server_image", "aic_logger_image"]
     for image in images:
         local("docker tag {} {}:5000/{}".format(image, ip, image))
         local("docker push {}:5000/{}".format(ip, image))
@@ -44,7 +47,6 @@ def push_images():
 
 def pull_images():
     ip = get_ip()
-    images = ["aic_py3_image", "kondor-manager", "aic_cpp_image", "aic_java_image", "aic_client_image", "aic_server_image", "aic_logger_image"]
     for image in images:
         run("docker pull {}:5000/{}".format(ip, image))
         run("docker tag {}:5000/{} {}".format(ip, image, image))
