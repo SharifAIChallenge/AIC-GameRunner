@@ -105,7 +105,7 @@ class Run(models.Model):
 
     def compile_compose_file(self):
         # Section 0: Set run status to running
-        logger.info("Starting execution of run {}".format(str(self)))
+        logger.warning("Starting execution of run {}".format(str(self)))
         self.start_time = timezone.now()
         self.status = self.RUNNING
         self.queue_reference_id = None  # Releasing queue id
@@ -243,17 +243,14 @@ class Run(models.Model):
 
             manager_service_creation_command = ' '.join(manager_service_spec)
 
-            print ("Invoking service with command {}".format(manager_service_creation_command))
+            logger.info("Invoking service with command {}".format(manager_service_creation_command))
 
             subprocess.call(manager_service_creation_command, shell=True)  # TODO : Use list instead of string
 
             time.sleep(5)
             manager = client.services.list(filters={"name": manager_uid})
-            print( "manager len={}".format(len(manager)) );
             if len(manager) == 0:
                 raise AssertionError("Service should have been created")
-            elif len(manager) != 1:
-                print( "len(manager) is greater than 1\n" + str(manager) );
             manager = manager[0]
 
             # TODO: Use docker interface to wait for the manager
@@ -340,7 +337,7 @@ class Run(models.Model):
             self.end_time = timezone.now()
             self.response = self.SENDING
             self.save()
-            logging.info("Done. status: {}".format("failed" if failed else "success"))
+            logging.warning("Done. status: {}".format("failed" if failed else "success"))
 
     def send_response(self):
         from api.serializers import RunReportSerializer
