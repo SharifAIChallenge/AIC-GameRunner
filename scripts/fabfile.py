@@ -38,8 +38,8 @@ def push_images():
     ip = get_ip()
     images = ["aic_py3_image", "kondor-manager", "aic_cpp_image", "aic_java_image", "aic_client_image", "aic_server_image", "aic_logger_image"]
     for image in images:
-        run("docker tag {} {}:5000/{}".format(image, ip, image))
-        run("docker push {}:5000/{}".format(ip, image))
+        local("docker tag {} {}:5000/{}".format(image, ip, image))
+        local("docker push {}:5000/{}".format(ip, image))
 
 
 def pull_images():
