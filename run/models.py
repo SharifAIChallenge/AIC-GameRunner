@@ -294,7 +294,10 @@ class Run(models.Model):
             self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
 
             logging.info("Cleaning up")
-            manager.remove()
+            try:
+                manager.remove()
+            except Exception as e:
+                logger.exception(e)
 
             # TODO: Cleaning spawned services in here should just be a fail-safe.
             # Manager should be reponsible for cleaning up when being killed.
@@ -336,6 +339,7 @@ class Run(models.Model):
             self.status = self.FAILURE if failed else self.SUCCESS
             self.end_time = timezone.now()
             self.response = self.SENDING
+            self.response_queue_reference_id = None
             self.save()
             logging.warning("Done. status: {}".format("failed" if failed else "success"))
 
