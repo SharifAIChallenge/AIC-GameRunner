@@ -161,6 +161,8 @@ DOCKER_HOST = None  # Set to None to use docker's default.
 
 SITE_URL = 'http://aichallenge.sharif.edu:2018/game/api/report/'
 
+RETRY_LIMIT = 10
+
 CELERY_BEAT_SCHEDULE = {
     'periodic_check_for_missed_runs': {
         'task': 'run.tasks.periodic_check_for_missed_runs',

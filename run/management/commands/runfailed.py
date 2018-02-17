@@ -21,9 +21,6 @@ class Command(BaseCommand):
             failedrun.response = Run.WAITING
             failedrun.response_queue_refrence_id = None
 
-            for parameter_value in failedrun.parameter_value_set.all():
-                parameter_value.delete()
-
             failedrun.save()
 
             self.response(failedrun.__str__())

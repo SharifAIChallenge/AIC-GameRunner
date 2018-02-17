@@ -100,6 +100,8 @@ class Run(models.Model):
     service_log = models.FileField(upload_to='logs/',
                                    null=True)
 
+    count_tries = models.SmallIntegerField(default=0)
+
     def __str__(self):
         return "{}:{}".format(str(self.operation), self.pk)
 
@@ -358,8 +360,13 @@ class Run(models.Model):
             if res.status_code == 200:
                 self.response = self.SENT
             else:
-                self.response_queue_reference_id = None
+                self.count_tries += 1
         except Exception as e:
             logger.exception(e)
-            self.response_queue_reference_id = None
+        if self.count_tries >= settings.RETRY_LIMIT:
+            self.queue_reference_id = None
+            self.status = self.PENDING
+            self.response = self.WAITING
+            self.count_tries = 0
+        self.response_queue_reference_id = None
         self.save()
