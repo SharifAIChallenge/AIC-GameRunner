@@ -77,3 +77,8 @@ def make_big(certfile=None):
     swarm_join()
     mount_nfs()
     docker_registry(certfile)
+
+
+def docker_prune():
+    local("docker system prune --force")
+    run("docker system prune --force")

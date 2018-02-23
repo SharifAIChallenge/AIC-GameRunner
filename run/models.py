@@ -343,6 +343,7 @@ class Run(models.Model):
             self.response = self.SENDING
             self.response_queue_reference_id = None
             self.save()
+            self.send_response()
             logging.warning("Done. status: {}".format("failed" if failed else "success"))
 
     def send_response(self):
