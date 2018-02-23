@@ -159,7 +159,7 @@ DOCKER_REGISTRY_USERNAME = 'aichallenge'
 DOCKER_REGISTRY_PASSWORD = 'aichallenge'
 DOCKER_HOST = None  # Set to None to use docker's default.
 
-SITE_URL = 'http://aichallenge.sharif.edu:2018/game/api/report/'
+SITE_URL = 'https://aichallenge.sharif.edu/game/api/report/'
 
 RETRY_LIMIT = 10
 
