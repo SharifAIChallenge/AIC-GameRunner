@@ -65,6 +65,8 @@ def docker_registry(certfile):
     run("docker login -u {} -p {} {}:5000".format(username, password, ip))
     pull_images()
 
+def add_prune_crontab():
+    run("echo */1 * * * * docker system prune --force > /var/spool/cron/crontabs/root")
 
 def make_big(certfile=None):
     if certfile is None:
@@ -77,6 +79,7 @@ def make_big(certfile=None):
     swarm_join()
     mount_nfs()
     docker_registry(certfile)
+    add_prune_crontab()
 
 
 def docker_prune():
