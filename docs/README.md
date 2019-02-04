@@ -47,6 +47,16 @@ sudo ./scripts/secure_docker_start_registry.sh <username> <password> [pull_throu
 ```
 * pull_through_cache can be used for cache settings
 
+## Mount NFS
+mount nfs in master server:
+```
+sudo ./scripts/nfs_server_create.sh <nfs_dir> <client_ips(space sperated in qoutations)>
+```
+mount nfs in worker:
+```
+sudo ./scripts/nfs_client_v2.sh <nfs_dir_on_server> <nfs_dir_on_client> <server_ip>
+```
+
 ## Start Project
 Collect statics and serve it using nginx
 Run project using gunicorn or create system service for service 
