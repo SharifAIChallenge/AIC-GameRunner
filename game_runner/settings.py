@@ -80,6 +80,7 @@ WSGI_APPLICATION = 'game_runner.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'game_runner',
         'USER': 'aichallenge',
         'PASSWORD': 'aichallenge',
         'HOST': 'localhost',
