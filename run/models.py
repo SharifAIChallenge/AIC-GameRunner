@@ -261,6 +261,8 @@ class Run(models.Model):
             self.log = ""
             failed = False
 
+            # TODO: remove legacy whiles
+
             logging.info("Waiting for the tasks to be started")
             while len(manager.tasks(filters={'desired-state': 'running'})) == 0 and \
                     len(manager.tasks(filters={'desired-state': 'shutdown'})) == 0:
@@ -282,24 +284,24 @@ class Run(models.Model):
                 time.sleep(STATUS_CHECK_PERIOD)
 
             # Logging
-            logger.info("Save log files")
-            services = client.services.list(filters={"name": manager_uid})
-            buffer = ""
-            logger.info(len(services))
-            for service in services:
-                logger.info("Service {} {} saving ...".format(service.name, service.id))
-                result = subprocess.run("docker service logs {}".format(service.id).split(),
-                                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                out = result.stdout
-                buffer = "{}Service {}-{}-{}\n\n{}\n\n\n".format(buffer, service.name, service.id, service.short_id,
-                                                         out.decode("utf-8"))
-            self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
-
-            logging.info("Cleaning up")
-            try:
-                manager.remove()
-            except Exception as e:
-                logger.exception(e)
+            # logger.info("Save log files")
+            # services = client.services.list(filters={"name": manager_uid})
+            # buffer = ""
+            # logger.info(len(services))
+            # for service in services:
+            #     logger.info("Service {} {} saving ...".format(service.name, service.id))
+            #     result = subprocess.run("docker service logs {}".format(service.id).split(),
+            #                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            #     out = result.stdout
+            #     buffer = "{}Service {}-{}-{}\n\n{}\n\n\n".format(buffer, service.name, service.id, service.short_id,
+            #                                              out.decode("utf-8"))
+            # self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
+            #
+            # logging.info("Cleaning up")
+            # try:
+            #     manager.remove()
+            # except Exception as e:
+            #     logger.exception(e)
 
             # TODO: Cleaning spawned services in here should just be a fail-safe.
             # Manager should be reponsible for cleaning up when being killed.

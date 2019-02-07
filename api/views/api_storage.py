@@ -26,13 +26,12 @@ class FileUploadView(APIView):
 
     @define_coreapi_field(name="file", location="body", required=True, )
     def put(self, request):
-        serializer_data = dict()
-        serializer_data['file'] = request.data['file']
-        serializer = FileSerializer(data=serializer_data)
+        serializer = FileSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save(owner=request.auth)
-            return Response({'token': serializer.data['id']}, status=status.HTTP_201_CREATED)
+            return Response({'token': serializer.data['id']},
+                            status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
