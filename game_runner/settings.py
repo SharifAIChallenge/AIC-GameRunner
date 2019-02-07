@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'docker_registry',
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -78,8 +79,9 @@ WSGI_APPLICATION = 'game_runner.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'game_runner',
+        #'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'game_runner.db',
         'USER': 'aichallenge',
         'PASSWORD': 'aichallenge',
         'HOST': 'localhost',
@@ -173,6 +175,12 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 30.0,
     }
 }
+
+RAVEN_CONFIG = {
+    'dsn': 'https://<key>:<secret>@sentry.io/<project>',
+}
+if not DEBUG:
+    INSTALLED_APPS.append('raven.contrib.django.raven_compat')
 
 try:
     from .local_settings import *
