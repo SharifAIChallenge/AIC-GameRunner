@@ -11,3 +11,4 @@ psycopg2
 requests==2.18.4
 Fabric==1.14.0
 sentry-sdk~=0.6.9
+ipython
