@@ -1,6 +1,6 @@
 model_mommy
 amqp==2.1.4
-celery~=4.2.1
+celery==4.0.2
 Django==1.10.5
 djangorestframework==3.5.3
 PyYAML==3.12
@@ -10,4 +10,4 @@ coreapi==2.3.3
 psycopg2
 requests==2.18.4
 Fabric==1.14.0
-sentry-sdk~=0.6.9
+kubernetes

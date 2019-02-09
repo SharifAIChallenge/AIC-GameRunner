@@ -86,3 +86,4 @@ if __name__ == "__main__":
     subprocess.call(["docker", "stack", "rm", manager_uid])
 
     # TODO: Add graceful shutdown which jumps to cleaning up
+
