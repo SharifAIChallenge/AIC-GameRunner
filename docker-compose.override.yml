@@ -1,0 +1,38 @@
+version: '3'
+services:
+  gamerunner:
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      DEVELOPMENT: 1
+    volumes:
+    - .:/gamerunner
+
+  celery:
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      DEVELOPMENT: 1
+
+  celerybeat:
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      DEVELOPMENT: 1
+
+  db:
+    image: postgres:11
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+      POSTGRES_USER: user
+    container_name: ${VERSION:-main}_db
+    volumes:
+      - ./data/postgis/data:/var/lib/postgresql/data

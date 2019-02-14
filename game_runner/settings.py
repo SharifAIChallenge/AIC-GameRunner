@@ -80,10 +80,10 @@ WSGI_APPLICATION = 'game_runner.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'game_runner',
-        'USER': 'aichallenge',
-        'PASSWORD': 'aichallenge',
-        'HOST': 'localhost',
+        'NAME': 'db',
+        'USER': 'user',
+        'PASSWORD': 'password',
+        'HOST': 'db',
         'PORT': '',
     }
 }
@@ -164,6 +164,8 @@ SITE_URL = 'https://aichallenge.sharif.edu/game/api/report/'
 
 RETRY_LIMIT = 10
 
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_PERSISTENT = True
 CELERY_BEAT_SCHEDULE = {
     'periodic_check_for_missed_runs': {
         'task': 'run.tasks.periodic_check_for_missed_runs',
