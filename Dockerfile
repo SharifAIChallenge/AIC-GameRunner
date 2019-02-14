@@ -19,4 +19,4 @@ RUN pip install -r requirements.txt
 COPY . /gamerunner/
 
 RUN chmod +x docker-entrypoint.sh
-RUN chmod +x wait_for_db.sh
+RUN chmod +x manage.py

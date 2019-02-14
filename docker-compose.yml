@@ -3,7 +3,7 @@ services:
   gamerunner:
     build: .
     image: ${CURRENT_IMAGE:-gamerunner:latest}
-    command: /gamerunner/wait_for_db.sh && /gamerunner/docker-entrypoint.sh
+    command: /gamerunner/docker-entrypoint.sh
     restart: always
     depends_on:
       - redis
@@ -15,7 +15,7 @@ services:
   celery:
     build: .
     image: ${CURRENT_IMAGE:-gamerunner:latest}
-    command: /gamerunner/wait_for_db.sh && celery -A celery_app worker --concurrency=10 -l info -Ofair
+    command: celery -A celery_app worker --concurrency=10 -l info -Ofair
     restart: always
     depends_on:
       - redis
@@ -27,7 +27,7 @@ services:
   celerybeat:
     build: .
     image: ${CURRENT_IMAGE:-gamerunner:latest}
-    command: /gamerunner/wait_for_db.sh && celery -A celery_app beat -l info
+    command: celery -A celery_app beat -l info
     restart: always
     depends_on:
       - redis
