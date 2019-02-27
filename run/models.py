@@ -337,10 +337,12 @@ class Run(models.Model):
                     else:
                         if parameter.compress:
                             now = context[parameter.name]
-                            shutil.make_archive(os.path.basename(now), 'zip',
-                                                os.path.dirname(now),
-                                                now)
-                            now += '.zip'
+                            now = shutil.make_archive(
+                                os.path.basename(now),
+                                'zip',
+                                os.path.dirname(now),
+                                now,
+                            )
                             context[parameter.name] = now
                         with open(context[parameter.name], 'rb') as file:
                             file_ = File()
