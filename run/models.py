@@ -341,7 +341,7 @@ class Run(models.Model):
                                 os.path.basename(now),
                                 'zip',
                                 os.path.dirname(now),
-                                now,
+                                os.path.basename(now),
                             )
                             context[parameter.name] = now
                         with open(context[parameter.name], 'rb') as file:
