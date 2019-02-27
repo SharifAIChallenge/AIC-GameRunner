@@ -64,6 +64,7 @@ class OperationParameter(models.Model):
     type = models.CharField(choices=PARAMETER_TYPES, verbose_name=_("type"), max_length=20)
     required = models.BooleanField(verbose_name=_("required"), default=True)
     is_input = models.BooleanField(verbose_name=_("is input?"))
+    compress = models.BooleanField(verbose_name=_("compress?"), default=False)
     max_size = models.IntegerField(verbose_name=_("max size in bytes"), default=0, help_text="Use 0 for unlimited")
 
     class Meta:

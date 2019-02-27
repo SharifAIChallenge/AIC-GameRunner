@@ -335,6 +335,13 @@ class Run(models.Model):
                         self.log += "ERROR: Parameter {} not found.\n"
                         failed = True
                     else:
+                        if parameter.compress:
+                            now = context[parameter.name]
+                            shutil.make_archive(os.path.basename(now), 'zip',
+                                                os.path.dirname(now),
+                                                now)
+                            now += '.zip'
+                            context[parameter.name] = now
                         with open(context[parameter.name], 'rb') as file:
                             file_ = File()
                             file_.file.save(parameter.name, DjangoFile(file))
