@@ -1,4 +1,5 @@
 import json
+import math
 
 from django.db import models
 from django.template import Engine, Context
@@ -311,11 +312,14 @@ class Run(models.Model):
             # in a specific manner. This must be changed to be implemented
             # using the API.
 
-            #services = client.services.list(filters={"name": "{}_".format(manager_uid)})
-            #for service in services:
+            # services = client.services.list(filters={"name": "{}_".format(manager_uid)})
+            # for service in services:
             #    service.remove()
 
             subprocess.call( "docker stack rm {}".format(manager_uid) , shell=True )
+            services = client.services.list(filters={"name": "{}".format(manager_uid)})
+            for service in services:
+                service.remove()
 
             logging.info("Execution finished")
             # Section 5: Save outputs. Set run status to success
