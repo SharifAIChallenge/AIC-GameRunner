@@ -11,6 +11,8 @@ services:
     volumes:
       - ./files:/gamerunner/files
       - ./static:/gamerunner/static
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
 
   celery:
     build: .
@@ -23,6 +25,8 @@ services:
     volumes:
       - ./files:/gamerunner/files
       - ./static:/gamerunner/static
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
 
   celerybeat:
     build: .
@@ -35,6 +39,8 @@ services:
     volumes:
       - ./files:/search/files
       - ./static:/search/static
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
 
   redis:
     image: redis:3.0.6
