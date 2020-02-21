@@ -13,6 +13,7 @@ services:
       - ./static:/gamerunner/static
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
+      - /nfs:/nfs
 
   celery:
     build: .
@@ -27,6 +28,7 @@ services:
       - ./static:/gamerunner/static
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
+      - /nfs:/nfs
 
   celerybeat:
     build: .
@@ -41,6 +43,7 @@ services:
       - ./static:/search/static
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
+      - /nfs:/nfs
 
   redis:
     image: redis:3.0.6
