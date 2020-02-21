@@ -9,8 +9,8 @@ services:
       - redis
     container_name: ${VERSION:-main}_gamerunner
     volumes:
-      - ./files:/search/files
-      - ./static:/search/static
+      - ./files:/gamerunner/files
+      - ./static:/gamerunner/static
 
   celery:
     build: .
@@ -21,8 +21,8 @@ services:
       - redis
     container_name: ${VERSION:-main}_celery
     volumes:
-      - ./files:/search/files
-      - ./static:/search/static
+      - ./files:/gamerunner/files
+      - ./static:/gamerunner/static
 
   celerybeat:
     build: .
