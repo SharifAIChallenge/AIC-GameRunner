@@ -63,3 +63,4 @@ services:
     volumes:
       - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./static:/static
+      - ./files/uploads:/uploads
