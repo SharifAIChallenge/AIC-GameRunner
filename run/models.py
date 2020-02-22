@@ -285,7 +285,7 @@ class Run(models.Model):
                         manager.remove()
                     except Exception as e:
                         logger.exception(e)
-                            break
+                    break
                 time.sleep(STATUS_CHECK_PERIOD)
 
             # Logging
