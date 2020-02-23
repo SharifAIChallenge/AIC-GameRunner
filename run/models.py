@@ -280,11 +280,6 @@ class Run(models.Model):
                     self.log += "ERROR: Killing manager due to timeout after {} seconds\n".format(
                         current_time - start_time
                     )
-                    logging.info("Cleaning up")
-                    try:
-                        manager.remove()
-                    except Exception as e:
-                        logger.exception(e)
                     break
                 time.sleep(STATUS_CHECK_PERIOD)
 
@@ -302,7 +297,11 @@ class Run(models.Model):
             #                                              out.decode("utf-8"))
             # self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
             #
-
+            logging.info("Cleaning up")
+            try:
+                manager.remove()
+            except Exception as e:
+                logger.exception(e)
 
             # TODO: Cleaning spawned services in here should just be a fail-safe.
             # Manager should be reponsible for cleaning up when being killed.
