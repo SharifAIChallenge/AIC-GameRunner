@@ -90,10 +90,12 @@ class Run(models.Model):
     WAITING = 0
     SENDING = 1
     SENT = 2
+    FAILED = 3
     response_choices = (
         (WAITING, 'Wating'),
         (SENDING, 'Sending'),
         (SENT, 'Sent'),
+        (FAILED, 'Failed'),
     )
     status = models.SmallIntegerField(choices=status_choices, default=PENDING)
     response = models.SmallIntegerField(choices=response_choices, default=WAITING)
@@ -105,6 +107,13 @@ class Run(models.Model):
 
     def __str__(self):
         return "{}:{}".format(str(self.operation), self.pk)
+
+    def recompile(self):
+        self.status = self.PENDING
+        self.queue_reference_id = None
+        self.response = self.WAITING
+        self.response_queue_reference_id = None
+        self.save()
 
     def compile_compose_file(self):
         # Section 0: Set run status to running
@@ -380,9 +389,6 @@ class Run(models.Model):
         except Exception as e:
             logger.exception(e)
         if self.count_tries >= settings.RETRY_LIMIT:
-            self.queue_reference_id = None
-            self.status = self.PENDING
-            self.response = self.WAITING
-            self.count_tries = 0
+            self.response = self.FAILED
         self.response_queue_reference_id = None
         self.save()
