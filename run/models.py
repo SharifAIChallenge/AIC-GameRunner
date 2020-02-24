@@ -251,7 +251,7 @@ class Run(models.Model):
             manager_service_spec.append('--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock')
             manager_service_spec.append('--detach=true')
 
-            manager_service_spec.append('kondor-manager') # TODO: Allow custom manager image name using settings
+            manager_service_spec.append(settings.MANAGER_IMAGE)  # TODO: Allow custom manager image name using settings
 
             manager_service_creation_command = ' '.join(manager_service_spec)
 
