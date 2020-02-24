@@ -140,7 +140,7 @@ class Run(models.Model):
                     file.write(self.operation.config)
                 for resource in self.operation.resources.all():
                     shutil.copyfile(
-                        resource.file.name,
+                        resource.file.path,
                         os.path.join(template_compile_path, resource.name)
                     )
 
@@ -172,7 +172,7 @@ class Run(models.Model):
                 for resource in self.operation.resources.all():
                     resource_path = os.path.join(shared_path, resource.name)
                     shutil.copyfile(
-                        resource.file.name,
+                        resource.file.path,
                         resource_path
                     )
                     context[resource.name] = resource_path
