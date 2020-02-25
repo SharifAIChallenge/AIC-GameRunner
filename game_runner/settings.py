@@ -159,8 +159,8 @@ NFS_DIR = '/nfs/'
 DOCKER_REGISTRY_URL = 'localhost:5000'
 DOCKER_REGISTRY_USERNAME = 'aichallenge'
 DOCKER_REGISTRY_PASSWORD = 'aichallenge'
-DOCKER_HOST = None  # Set to None to use docker's default.
-MANAGER_IMAGE = 'kondor-manager'
+DOCKER_HOST = 'unix://var/run/docker.sock'  # Set to None to use docker's default.
+MANAGER_IMAGE = 'aic_manager_image'
 
 SITE_URL = 'https://aichallenge.sharif.edu/game/api/report/'
 
