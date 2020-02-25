@@ -39,8 +39,8 @@ services:
       - redis
     container_name: ${VERSION:-main}_celerybeat
     volumes:
-      - ./files:/search/files
-      - ./static:/search/static
+      - ./files:/gamerunner/files
+      - ./static:/gamerunner/static
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
       - /nfs:/nfs
