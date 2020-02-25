@@ -1,11 +1,12 @@
 model_mommy
 celery[redis]~=4.2.1
-Django~=1.10.5
-djangorestframework~=3.5.3
+Django~=1.11.28
+djangorestframework
 docker
 docker-compose
 coreapi~=2.3.3
 psycopg2-binary
-requests~=2.18.4
+requests
 kubernetes
 gunicorn
+ipython
