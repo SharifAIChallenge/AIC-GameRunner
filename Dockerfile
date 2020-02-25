@@ -17,6 +17,7 @@ COPY requirements.txt /gamerunner/
 RUN pip install -r requirements.txt
 
 COPY . /gamerunner/
+RUN ./manage.py collectstatic --no-input
 
 RUN chmod +x docker-entrypoint.sh
 RUN chmod +x manage.py
