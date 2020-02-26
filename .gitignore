@@ -1,5 +1,9 @@
+.htpasswd
+
 .idea
+data
 files/*
+static/*
 db.sqlite3
 .directory
 

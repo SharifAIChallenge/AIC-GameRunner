@@ -1,62 +1,25 @@
 # Installation
 
-## Install Postgres
-Install postgres on your server
-```
-$ sudo apt update
-$ sudo apt install postgresql postgresql-contrib
-```
-Connect postgres from postgres account on your server
-```
-$ sudo -u postgres psql
-```
-Create database for project
-```
-postgres=# CREATE DATABASE game_runner;
-```
-Create role for project
-```
-postgres=# CREATE USER game_runner_user WITH PASSWORD 'password';
-postgres=# ALTER ROLE game_runner_user SET client_encoding TO 'utf8';
-postgres=# ALTER ROLE game_runner_user SET default_transaction_isolation TO 'read committed';
-postgres=# ALTER ROLE game_runner_user SET timezone TO 'UTC';
-postgres=# GRANT ALL PRIVILEGES ON DATABASE game_runner TO game_runner_user;
-postgres=# \q
-```
-
-## Install Docker 
-
-## Create SSL Certificate
-```
-$ sudo ./scripts/create_registry_certificates.sh <middle_ip>
-```
-
 ## Install Dependencies
-Run make_me_big.sh in scripts folder as root
-```
-$ sudo ./scripts/make_me_big.sh <nfs_dir_middle> <nfs_dir_worker> <middle_ip> <certificate_file>
-```
 
-## Start Docker Registry
-```
-sudo ./scripts/docker_start_registry.sh 
-```
-Or for more security:
-```
-sudo ./scripts/secure_docker_start_registry.sh <username> <password> [pull_through_cache]
-```
-* pull_through_cache can be used for cache settings
+You can use ansible playbooks (master.yml) written in: [AIC-GameRunnerManager](https://github.com/SharifAIChallenge/AIC-GameRunnerManager)
 
-## Mount NFS
-mount nfs in master server:
-```
-sudo ./scripts/nfs_server_create.sh <nfs_dir> <client_ips(space sperated in qoutations)>
-```
-mount nfs in worker:
-```
-sudo ./scripts/nfs_client_v2.sh <nfs_dir_on_server> <nfs_dir_on_client> <server_ip>
-```
+Then configure host postgres to be accessible inside docker container network  
+(hint: configure postgres to listen 172.17.0.1 also add network ip range to pg_hba.conf)
+
+Finally reconfigure `game_runner/settings.py` in following parts:
+1. `DATABASE` to host postgres
+2. `DOCKER_REGISTRY_*` to docker registry
+3. `MANAGER_IMAGE` to docker registery manager image like `example.com/aic_manager_image`
+4. `SITE_URL` to aichallenge site url for report runs
 
 ## Start Project
-Collect statics and serve it using nginx
-Run project using gunicorn or create system service for service 
+```
+docker-compose -f docker-compose.yml up -d --build --remove-orphans
+```
+
+Note: development contains psql itself:
+```
+docker-compose up -d --build --remove-orphans
+```
+

@@ -90,10 +90,12 @@ class Run(models.Model):
     WAITING = 0
     SENDING = 1
     SENT = 2
+    FAILED = 3
     response_choices = (
         (WAITING, 'Wating'),
         (SENDING, 'Sending'),
         (SENT, 'Sent'),
+        (FAILED, 'Failed'),
     )
     status = models.SmallIntegerField(choices=status_choices, default=PENDING)
     response = models.SmallIntegerField(choices=response_choices, default=WAITING)
@@ -105,6 +107,13 @@ class Run(models.Model):
 
     def __str__(self):
         return "{}:{}".format(str(self.operation), self.pk)
+
+    def recompile(self):
+        self.status = self.PENDING
+        self.queue_reference_id = None
+        self.response = self.WAITING
+        self.response_queue_reference_id = None
+        self.save()
 
     def compile_compose_file(self):
         # Section 0: Set run status to running
@@ -131,7 +140,7 @@ class Run(models.Model):
                     file.write(self.operation.config)
                 for resource in self.operation.resources.all():
                     shutil.copyfile(
-                        resource.file.name,
+                        resource.file.path,
                         os.path.join(template_compile_path, resource.name)
                     )
 
@@ -163,7 +172,7 @@ class Run(models.Model):
                 for resource in self.operation.resources.all():
                     resource_path = os.path.join(shared_path, resource.name)
                     shutil.copyfile(
-                        resource.file.name,
+                        resource.file.path,
                         resource_path
                     )
                     context[resource.name] = resource_path
@@ -242,7 +251,7 @@ class Run(models.Model):
             manager_service_spec.append('--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock')
             manager_service_spec.append('--detach=true')
 
-            manager_service_spec.append('kondor-manager') # TODO: Allow custom manager image name using settings
+            manager_service_spec.append(settings.MANAGER_IMAGE)  # TODO: Allow custom manager image name using settings
 
             manager_service_creation_command = ' '.join(manager_service_spec)
 
@@ -298,11 +307,11 @@ class Run(models.Model):
             #                                              out.decode("utf-8"))
             # self.service_log.save('{}.log'.format(self.pk), DjangoContentFile(buffer))
             #
-            # logging.info("Cleaning up")
-            # try:
-            #     manager.remove()
-            # except Exception as e:
-            #     logger.exception(e)
+            logging.info("Cleaning up")
+            try:
+                manager.remove()
+            except Exception as e:
+                logger.exception(e)
 
             # TODO: Cleaning spawned services in here should just be a fail-safe.
             # Manager should be reponsible for cleaning up when being killed.
@@ -380,9 +389,6 @@ class Run(models.Model):
         except Exception as e:
             logger.exception(e)
         if self.count_tries >= settings.RETRY_LIMIT:
-            self.queue_reference_id = None
-            self.status = self.PENDING
-            self.response = self.WAITING
-            self.count_tries = 0
+            self.response = self.FAILED
         self.response_queue_reference_id = None
         self.save()

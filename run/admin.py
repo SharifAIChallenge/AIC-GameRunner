@@ -13,7 +13,7 @@ class RunAdmin(admin.ModelAdmin):
     
     def execute(self, request, queryset):
         for run in queryset:
-            run.compile_compose_file()
+            run.recompile()
 
 admin.site.register(Run, RunAdmin)
 admin.site.register(ParameterValue)
