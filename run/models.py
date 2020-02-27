@@ -136,7 +136,7 @@ class Run(models.Model):
                 template_compile_path = os.path.join(tmp_path, "compile")
                 os.makedirs(template_compile_path)
                 raw_compose_file_path = os.path.join(template_compile_path, COMPOSE_FILE_NAME)
-                with open(raw_compose_file_path, "w") as file:
+                with open(raw_compose_file_path, "w", encoding='utf-8') as file:
                     file.write(self.operation.config)
                 for resource in self.operation.resources.all():
                     shutil.copyfile(
@@ -187,7 +187,7 @@ class Run(models.Model):
 
                 compiled_compose_file_path = os.path.join(shared_path, COMPOSE_FILE_NAME)
                 logger.info(rendered_compose_file)
-                with open(compiled_compose_file_path, "w") as file:
+                with open(compiled_compose_file_path, "w", encoding='utf-8') as file:
                     file.write(rendered_compose_file)
 
             # Section 4: Provide config file to the manager node and run it
@@ -325,7 +325,7 @@ class Run(models.Model):
             # for service in services:
             #    service.remove()
 
-            subprocess.call( "docker stack rm {}".format(manager_uid) , shell=True )
+            subprocess.call("docker stack rm {}".format(manager_uid) , shell=True )
             services = client.services.list(filters={"name": "{}".format(manager_uid)})
             for service in services:
                 service.remove()
