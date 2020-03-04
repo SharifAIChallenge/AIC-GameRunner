@@ -150,6 +150,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static/'
 MEDIA_ROOT = 'files/'
+MEDIA_URL = '/'
 
 # Project User Model
 AUTH_USER_MODEL = 'auth.User'
