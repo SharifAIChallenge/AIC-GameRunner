@@ -1,5 +1,7 @@
 import uuid
+from os.path import basename
 from tempfile import TemporaryFile
+from urllib.parse import urlsplit
 
 import requests
 from django.db import models
@@ -22,8 +24,7 @@ class File(models.Model):
             for chunk in r.iter_content(chunk_size=4096):
                 tf.write(chunk)
             tf.seek(0)
-            self.file = DjangoFile(tf)
-            self.save()
+            self.file.save(basename(urlsplit(url).path), DjangoFile(tf))
 
     def __str__(self):
         return '{}:{}'.format(self.id, self.owner)

@@ -45,6 +45,7 @@ class FileUploadFromUrlView(APIView):
             except File.FileNotFoundError as e:
                 return Response(e, status=status.HTTP_400_BAD_REQUEST)
 
+            file.save()
             return Response({'token': serializer.data['id']},
                             status=status.HTTP_201_CREATED)
 
