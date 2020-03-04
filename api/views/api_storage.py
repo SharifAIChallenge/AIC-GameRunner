@@ -46,7 +46,7 @@ class FileUploadFromUrlView(APIView):
                 return Response(e, status=status.HTTP_400_BAD_REQUEST)
 
             file.save()
-            return Response({'token': serializer.data['id']},
+            return Response({'token': file.id},
                             status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
