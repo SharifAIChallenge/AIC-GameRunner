@@ -1,6 +1,3 @@
-import os
-
-import coreapi
 from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser
 
 from api.views.utils import define_coreapi_field
-from storage.serializers import FileSerializer
+from storage.serializers import FileSerializer, FileUrlSerializer
 from storage.models import File
 
 
@@ -30,6 +27,24 @@ class FileUploadView(APIView):
 
         if serializer.is_valid():
             serializer.save(owner=request.auth)
+            return Response({'token': serializer.data['id']},
+                            status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FileUploadFromUrlView(APIView):
+
+    def post(self, request):
+        serializer = FileUrlSerializer(data=request.data)
+
+        if serializer.is_valid():
+            file = File(owner=request.auth)
+            try:
+                file.retrieve_from_url(serializer.validated_data['url'])
+            except File.FileNotFoundError as e:
+                return Response(e, status=status.HTTP_400_BAD_REQUEST)
+
             return Response({'token': serializer.data['id']},
                             status=status.HTTP_201_CREATED)
 
