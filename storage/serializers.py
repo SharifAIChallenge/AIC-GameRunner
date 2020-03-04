@@ -8,3 +8,7 @@ class FileSerializer(serializers.ModelSerializer):
         fields = ('id', 'created_at', 'owner', 'file',)
         read_only_fields = ('id', 'created_at', 'owner', )
 
+
+class FileUrlSerializer(serializers.Serializer):
+    url = serializers.URLField()
+
