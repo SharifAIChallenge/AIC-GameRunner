@@ -25,7 +25,7 @@ class File(models.Model):
     file = models.FileField(upload_to=get_file_path)
 
     def send_token(self, user_token, language, infra_host):
-        headers = {'Authorization': '{}'.format(user_token),
+        headers = {'Authorization': 'Token {}'.format(user_token),
                    'Content-Type': 'application/json'}
         data = {"infra_token": str(self.id),
                 "language": language,
