@@ -24,9 +24,10 @@ class File(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to=get_file_path)
 
-    def send_token(self, user_token, language, infra_host):
+    def send_token(self, user_token, language, infra_host, accept_language):
         headers = {'Authorization': 'Token {}'.format(user_token),
-                   'Content-Type': 'application/json'}
+                   'Content-Type': 'application/json',
+                   'Accept-Language': accept_language}
         data = {"infra_token": str(self.id),
                 "language": language,
                 "download_link": f"http://{infra_host}{self.file.url}"}
