@@ -86,6 +86,10 @@ DATABASES = {
         'HOST': 'db',
         'PORT': '',
     }
+    ,'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 }
 
 LOGGING = {
@@ -126,9 +130,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'api.authentication.TokenIPAuth',
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'api.permissions.IsAuthenticated',
-    )
 }
 
 # Internationalization
@@ -163,7 +164,10 @@ DOCKER_REGISTRY_PASSWORD = 'aichallenge'
 DOCKER_HOST = 'unix://var/run/docker.sock'  # Set to None to use docker's default.
 MANAGER_IMAGE = 'aic_manager_image'
 
-SITE_URL = 'https://aichallenge.sharif.edu/game/api/report/'
+SITE_TOKEN = ''
+SITE_URL = 'https://aichallenge.sharif.edu'
+RUN_REPORT_PATH = '/game/api/report/'
+UPLOAD_REPORT_PATH = '/upload/api/report/'
 
 RETRY_LIMIT = 10
 

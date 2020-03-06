@@ -379,8 +379,8 @@ class Run(models.Model):
         data = serializer.data
         try:
             data = json.dumps(data)
-            logger.info("TESTIG JSON " + str(data))
-            res = requests.post(settings.SITE_URL, data=data, headers=headers)
+            logger.info("TESTING JSON " + str(data))
+            res = requests.post(settings.SITE_URL + settings.RUN_REPORT_PATH, data=data, headers=headers)
             logger.info(res.status_code)
             if res.status_code == 200:
                 self.response = self.SENT

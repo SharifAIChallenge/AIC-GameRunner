@@ -1,9 +1,9 @@
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from rest_framework.serializers import ListSerializer
 from rest_framework.views import APIView
 
+from api.permissions import IsAuthenticated
 from api.serializers import RunCreateSerializer, RunReportSerializer
 from api.views.utils import define_coreapi_field
 from run.models import Run
@@ -12,6 +12,7 @@ from django.utils import timezone
 
 
 class RunCreateView(APIView):
+    permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser,)
 
     def post(self, request):
@@ -41,6 +42,8 @@ class RunCreateView(APIView):
 
 
 class RunReportView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     @define_coreapi_field(name="time", location="query", required=True, type="float", )
     def get(self, request):
         data = request.GET

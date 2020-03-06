@@ -1,11 +1,14 @@
+import requests
+from django.conf import settings
 from django.http import HttpResponse
-from rest_framework import status
+from rest_framework import status, parsers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser
 
+from api.permissions import IsAuthenticated
 from api.views.utils import define_coreapi_field
-from storage.serializers import FileSerializer, FileUrlSerializer
+from storage.serializers import FileSerializer, FileUrlSerializer, FileDirectSerializer
 from storage.models import File
 
 
@@ -19,6 +22,7 @@ class DefaultNamedFileUploadParser(FileUploadParser):
 
 
 class FileUploadView(APIView):
+    permission_classes = (IsAuthenticated,)
     parser_classes = (DefaultNamedFileUploadParser, )
 
     @define_coreapi_field(name="file", location="body", required=True, )
@@ -33,7 +37,28 @@ class FileUploadView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class FileDirectUploadView(APIView):
+    parser_classes = (parsers.MultiPartParser, )
+
+    @define_coreapi_field(name="file", location="body", required=True, )
+    def post(self, request):
+        serializer = FileDirectSerializer(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            print(serializer.validated_data)
+            f = File.objects.create(owner_id=settings.SITE_TOKEN, file=serializer.validated_data['file'])
+            try:
+                response = f.send_token(serializer.validated_data['user_token'],
+                                        serializer.validated_data['language'])
+            except requests.RequestException:
+                return Response("Something Went Wrong", status=status.HTTP_400_BAD_REQUEST)
+            return Response(response.json(), status=response.status_code)
+
+        return Response("Bad Request", status=status.HTTP_400_BAD_REQUEST)
+
+
 class FileUploadFromUrlView(APIView):
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         serializer = FileUrlSerializer(data=request.data)
@@ -53,6 +78,7 @@ class FileUploadFromUrlView(APIView):
 
 
 class FileDownloadView(APIView):
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, token):
         try:
