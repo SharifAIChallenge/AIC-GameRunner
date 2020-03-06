@@ -43,13 +43,12 @@ class FileDirectUploadView(APIView):
     @define_coreapi_field(name="file", location="body", required=True, )
     def post(self, request):
         serializer = FileDirectSerializer(data=request.data)
-
         if serializer.is_valid(raise_exception=True):
-            print(serializer.validated_data)
             f = File.objects.create(owner_id=settings.SITE_TOKEN, file=serializer.validated_data['file'])
             try:
                 response = f.send_token(serializer.validated_data['user_token'],
-                                        serializer.validated_data['language'])
+                                        serializer.validated_data['language'],
+                                        request.get_host())
             except requests.RequestException:
                 return Response("Something Went Wrong", status=status.HTTP_400_BAD_REQUEST)
             return Response(response.json(), status=response.status_code)

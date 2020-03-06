@@ -24,11 +24,11 @@ class File(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to=get_file_path)
 
-    def send_token(self, user_token, language):
+    def send_token(self, user_token, language, infra_host):
         headers = {'Authorization': '{}'.format(user_token)}
         data = {"infra_token": str(self.id),
                 "language": language,
-                "url": self.file.url}
+                "url": f"http://{infra_host}{self.file.url}"}
         data = json.dumps(data)
         res = requests.post(settings.SITE_URL + settings.UPLOAD_REPORT_PATH, data=data, headers=headers)
         return res
