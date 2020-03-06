@@ -28,7 +28,7 @@ class File(models.Model):
         headers = {'Authorization': '{}'.format(user_token)}
         data = {"infra_token": str(self.id),
                 "language": language,
-                "url": f"http://{infra_host}{self.file.url}"}
+                "download_link": f"http://{infra_host}{self.file.url}"}
         data = json.dumps(data)
         res = requests.post(settings.SITE_URL + settings.UPLOAD_REPORT_PATH, data=data, headers=headers)
         return res
