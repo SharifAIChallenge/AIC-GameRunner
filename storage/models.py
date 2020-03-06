@@ -26,8 +26,9 @@ class File(models.Model):
 
     def send_token(self, user_token, language, infra_host, accept_language):
         headers = {'Authorization': 'Token {}'.format(user_token),
-                   'Content-Type': 'application/json',
-                   'Accept-Language': accept_language}
+                   'Content-Type': 'application/json'}
+        if accept_language:
+            headers['Accept-Language'] = accept_language
         data = {"infra_token": str(self.id),
                 "language": language,
                 "download_link": f"http://{infra_host}{self.file.url}"}

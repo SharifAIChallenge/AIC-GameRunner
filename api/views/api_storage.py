@@ -49,7 +49,7 @@ class FileDirectUploadView(APIView):
                 response = f.send_token(serializer.validated_data['user_token'],
                                         serializer.validated_data['language'],
                                         request.get_host(),
-                                        request.META.HTTP_ACCEPT_LANGUAGE)
+                                        request.META.get('HTTP_ACCEPT_LANGUAGE'))
             except requests.RequestException:
                 return Response("Something Went Wrong", status=status.HTTP_400_BAD_REQUEST)
             return Response(response.json(), status=response.status_code)
