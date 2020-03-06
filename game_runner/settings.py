@@ -186,6 +186,9 @@ RAVEN_CONFIG = {
 if not DEBUG:
     INSTALLED_APPS.append('raven.contrib.django.raven_compat')
 
+FILE_UPLOAD_MAX_MEMORY_SIZE = 26214400
+DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
+
 try:
     from .local_settings import *
 except:
