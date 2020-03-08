@@ -5,14 +5,14 @@ from django.db import transaction
 from .models import Run
 
 
-@transaction.atomic()
+@transaction.atomic
 def schedule_sending_response(run):
     if run.response_queue_reference_id is None and run.response == Run.SENDING:
         run.response_queue_reference_id = sending_response.delay(run.pk)
         run.save()
 
 
-@transaction.atomic()
+@transaction.atomic
 def schedule_run_execution(run):
     if run.queue_reference_id is None and run.status == Run.PENDING:
         run.queue_reference_id = execute_run.delay(run.pk)
