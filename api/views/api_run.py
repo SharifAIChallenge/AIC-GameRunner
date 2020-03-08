@@ -10,6 +10,8 @@ from run.models import Run
 import datetime
 from django.utils import timezone
 
+from run.tasks import execute_run
+
 
 class RunCreateView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -26,6 +28,7 @@ class RunCreateView(APIView):
             serializer = RunCreateSerializer(data=run_json)
             if serializer.is_valid():
                 run = serializer.save(owner=request.auth)
+                execute_run.delay(run.id)
                 result.append({
                     'success': True,
                     'run_id': run.id

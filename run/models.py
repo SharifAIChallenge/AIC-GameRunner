@@ -388,7 +388,7 @@ class Run(models.Model):
                 self.count_tries += 1
         except Exception as e:
             logger.exception(e)
-        if self.count_tries >= settings.RETRY_LIMIT:
+        if True or self.count_tries >= settings.RETRY_LIMIT:
             self.response = self.FAILED
         self.response_queue_reference_id = None
         self.save()

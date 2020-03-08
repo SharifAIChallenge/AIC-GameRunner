@@ -30,20 +30,20 @@ services:
       - /usr/bin/docker:/usr/bin/docker
       - /nfs:/nfs
 
-  celerybeat:
-    build: .
-    image: ${CURRENT_IMAGE:-gamerunner:latest}
-    command: celery -A celery_app beat -l info
-    restart: always
-    depends_on:
-      - redis
-    container_name: ${VERSION:-main}_celerybeat
-    volumes:
-      - ./files:/gamerunner/files
-      - ./static:/gamerunner/static
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
-      - /nfs:/nfs
+#  celerybeat:
+#    build: .
+#    image: ${CURRENT_IMAGE:-gamerunner:latest}
+#    command: celery -A celery_app beat -l info
+#    restart: always
+#    depends_on:
+#      - redis
+#    container_name: ${VERSION:-main}_celerybeat
+#    volumes:
+#      - ./files:/gamerunner/files
+#      - ./static:/gamerunner/static
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - /usr/bin/docker:/usr/bin/docker
+#      - /nfs:/nfs
 
   redis:
     image: redis:3.0.6
